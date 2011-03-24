@@ -35,6 +35,12 @@ public class Position {
 	 * graph.
 	 */
 	private int topPos;
+	
+	/**
+	 * The name of the node.
+	 * Used for GraphML.
+	 */
+	private String namePos;
 
 	/**
 	 * Basic constructor.
@@ -50,6 +56,21 @@ public class Position {
 		}
 	}
 
+	/**
+	 * Set the name of this position.
+	 * @param name - name to be set.
+	 */
+	public final void setName(final String name) {
+		this.namePos = name;
+	}
+
+	/**
+	 * Get the name of this position.
+	 * @return The name of the position.
+	 */
+	public final String getName() {
+		return this.namePos;
+	}
 
 	/**
 	 * An agent can inform others that this position was beneficial.

@@ -1,0 +1,24 @@
+package graph;
+
+import lcs.Edge;
+
+import org.apache.commons.collections15.Transformer;
+
+import edu.uci.ics.jung.io.graphml.EdgeMetadata;
+
+/**
+ * @author Dumitrescu Iustin
+ *
+ */
+public class EdgeTransformer implements Transformer<EdgeMetadata, Edge> {
+
+	@Override
+	public final Edge transform(final EdgeMetadata metadata) {
+		Edge ret;
+		String source = metadata.getSource();
+		String target = metadata.getTarget();
+		ret = new Edge(source, target);
+		return ret;
+	}
+
+}
