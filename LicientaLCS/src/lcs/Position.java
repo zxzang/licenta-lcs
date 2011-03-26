@@ -21,8 +21,15 @@ public class Position {
 	
 	/**
 	 * The blocked routes from this position.
+	 * A type of marking left by robots on the graph edges
 	 */
 	LinkedList<Position> blockedRoutes;
+	
+	/**
+	 * Is this node a dead-end or not ?
+	 * Also, this will be established by one or more agents.
+	 */
+	boolean deadEnd;
 
 	/**
 	 * Indicates if there is a physical, unmovable obstacle within
@@ -60,6 +67,7 @@ public class Position {
 			this.robot = -1;
 			this.topPos = -1;
 			this.blockedRoutes = new LinkedList<Position>();
+			this.deadEnd = false;
 		}
 	}
 
@@ -117,6 +125,22 @@ public class Position {
 	 */
 	protected final int getTopologicPostion() {
 		return this.topPos;
+	}
+	
+	public final void blockRoute(Position blocked){
+		blockedRoutes.add(blocked);
+	}
+	
+	public final LinkedList<Position> getBlockedRoutes(){
+		return blockedRoutes;
+	}
+	
+	public final boolean isDeadEnd(){
+		return deadEnd;
+	}
+	
+	public final void setDeadEnd(){
+		deadEnd = true;
 	}
 
 }

@@ -9,10 +9,20 @@ import java.util.*;
  */
 public class Robot implements Runnable {
 
+	class PositionNRoutes{
+		Position pos;
+		int nR;
+		public PositionNRoutes(Position x, int y){
+			pos = x;
+			nR = y;
+		}
+	}
+	
 	Position current;
 	Position target;
 	Environment env;
-	LinkedList<Position> lastSteps;
+	LinkedList<PositionNRoutes> lastSteps;
+	int noStepsBack;
 	int no;
 	
 	/*
@@ -33,16 +43,26 @@ public class Robot implements Runnable {
 		while (current != target){
 			
 			adjacent = env.getAdjacent(this);
-			nextMove = null;
-			
-			while (nextMove == null){
-				if (type == 1) // Robot care vrea neaparat sa se miste pe cea mai buna pozitie
-					nextMove = getNextMoveAbsolute(adjacent);
-				else // Robotul decide sa urmeze cea mai buna cale libera					
-					nextMove = getNextMoveAvailable(adjacent);
-				}
-			env.makeAction(no, nextMove);
-			current = nextMove;
+			removeDeadEnds(adjacent);
+			if (adjacent.size() == 1){ // we're stuck
+				goBackNMark();
+			}
+			else {
+				nextMove = null;
+				
+				while (nextMove == null){
+					if (type == 1) // Robot care vrea neaparat sa se miste pe cea mai buna pozitie
+						nextMove = getNextMoveAbsolute(adjacent);
+					else // Robotul decide sa urmeze cea mai buna cale libera					
+						nextMove = getNextMoveAvailable(adjacent);
+					}
+				
+				lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
+				if (lastSteps.size() >= noStepsBack)
+					lastSteps.removeFirst();
+				env.makeAction(no, nextMove);
+				current = nextMove;
+			}
 		}
 		
 		System.out.println("Landed on the promised land!");
@@ -54,10 +74,11 @@ public class Robot implements Runnable {
 	 * @param n - robot number
 	 * @param t - type of robot
 	 */
-	public Robot(int n, int t){
+	public Robot(int n, int t, int nSteps){
 		no = n;		
 		type = t;
-		lastSteps = new LinkedList<Position>();
+		noStepsBack = nSteps;
+		lastSteps = new LinkedList<PositionNRoutes>();
 	}
 
 	/*
@@ -92,6 +113,39 @@ public class Robot implements Runnable {
 	Position getNextMoveAvailable(Vector<Position> available){
 		System.out.println("eu " + Thread.currentThread() + "cer mutare best available");
 		return null;
+	}
+	
+	void removeDeadEnds(Vector<Position> adjacent){
+		Vector<Position> toRemove = new Vector<Position>();
+		
+		for(Position x:adjacent)
+			if (x.isDeadEnd())
+				toRemove.add(x);
+		for(Position x: toRemove)
+			adjacent.remove(x);
+	}
+	
+	void goBackNMark(){
+		boolean toBlock = true;
+		PositionNRoutes aux;
+		Position nextMove;
+		int noARoutes;
+		int noOCurrentRoutes = 1;
+		
+		while (!lastSteps.isEmpty()){
+			aux = lastSteps.removeLast();
+			nextMove = aux.pos;
+			noARoutes = aux.nR;			
+			
+			if (toBlock){
+				current.blockRoute(nextMove);
+				nextMove.blockRoute(current);
+				noOCurrentRoutes --;
+			}
+			
+		}
+		
+		
 	}
 	
 	
