@@ -1,5 +1,6 @@
 package lcs;
 
+import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -17,6 +18,11 @@ public class Position {
 	 * The value left by other agents.
 	 */
 	int pheromone;
+	
+	/**
+	 * The blocked routes from this position.
+	 */
+	LinkedList<Position> blockedRoutes;
 
 	/**
 	 * Indicates if there is a physical, unmovable obstacle within
@@ -53,6 +59,7 @@ public class Position {
 			this.sem = new Semaphore(1, true);
 			this.robot = -1;
 			this.topPos = -1;
+			this.blockedRoutes = new LinkedList<Position>();
 		}
 	}
 

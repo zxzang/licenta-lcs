@@ -18,7 +18,6 @@ import graph.VertexTransformer;
  * @author Iustin Dumitrescu
  *
  */
-
 public class Environment {
 
 	/**
