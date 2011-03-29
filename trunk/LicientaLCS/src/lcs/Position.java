@@ -35,7 +35,10 @@ public class Position {
 	 * Indicates if there is a physical, unmovable obstacle within
 	 * this place.
 	 */
-	boolean obstacle;
+	public static final int typeNormal = 0;
+	public static final int typeObstacle = 1;
+	public static final int typeFinal = 2;
+	int type;
 
 	/**
 	 * Indicates which robot is currently occupying this position.
@@ -54,21 +57,41 @@ public class Position {
 	 * Used for GraphML.
 	 */
 	private String namePos;
+	
+	/**
+	 * A user operated integer.
+	 * Can be used for topological sort.
+	 */
+	public int userVar;
 
 	/**
 	 * Basic constructor.
 	 * @param isObstacle - specifies if this position is a obstacle.
 	 */
-	public Position(final boolean isObstacle) {
-		this.obstacle = isObstacle;
-		if (!this.obstacle) {
-			this.pheromone = 0;
+	public Position(final int type) {
+		this.type = type;
+		switch (this.type) {
+		case typeFinal:
 			this.sem = new Semaphore(1, true);
-			this.robot = -1;
-			this.topPos = -1;
 			this.blockedRoutes = new LinkedList<Position>();
 			this.deadEnd = false;
+			break;
+		case typeNormal:
+			this.sem = new Semaphore(1, true);
+			this.blockedRoutes = new LinkedList<Position>();
+			this.deadEnd = false;
+			break;
+		case typeObstacle:
+			break;
+		default:
+			System.err.println("[Position.Position]Unknown option " + this.type);
+			System.exit(-1);
+			break;
 		}
+		this.robot = -1;
+		this.topPos = -1;
+		this.pheromone = 0;
+		this.userVar = 0;
 	}
 
 	/**
@@ -127,10 +150,18 @@ public class Position {
 		return this.topPos;
 	}
 	
+	/**
+	 * Adds a Position to the blocked vector.
+	 * @param blocked - the position to be blocked.
+	 */
 	public final void blockRoute(Position blocked){
 		blockedRoutes.add(blocked);
 	}
 	
+	/**
+	 * Gets the blocked routes from this position.
+	 * @return a LinkedList of the blocked routes.
+	 */
 	public final LinkedList<Position> getBlockedRoutes(){
 		return blockedRoutes;
 	}
