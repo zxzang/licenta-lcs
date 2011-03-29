@@ -3,6 +3,9 @@ package lcs;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Vector;
 
 import edu.uci.ics.jung.graph.Graph;
@@ -39,6 +42,8 @@ public class Environment {
 	 * The network in the Environment.
 	 */
 	Graph<Position, Edge> network;
+	
+	// TODO consider adding a barrier for sync + a sync function
 
 	/**
 	 * Basic constructor.
@@ -96,7 +101,52 @@ public class Environment {
 	 * Used to topologically sort the graph.
 	 */
 	private void sortTop() {
-		// TODO
+		// TODO remove stupid comments after testing code
+		// L - Empty list that will contain the sorted nodes
+		LinkedList<Position> l = new LinkedList<Position>();
+		// S - Set of all nodes with no incoming edges
+		Collection<Position> c = network.getVertices();
+		for (Iterator<Position> p = c.iterator(); p.hasNext(); ) {
+			if (network.inDegree(p.next()) > 0)
+				p.remove(); // XXX will this work?!
+		}
+		
+		for (Iterator<Position> p = c.iterator(); p.hasNext(); ) {
+			this.visit(p.next(), l);
+		} 
+		
+		/*while (c.isEmpty() == false) {
+			Iterator<Position> it = c.iterator();
+			Position p = it.next();
+			it.remove();
+			l.add(p);
+			
+			Collection<Position> pred = network.getPredecessors(p); 
+			for (Iterator<Position> itPred = pred.iterator(); itPred.hasNext(); ) {
+				// XXX remove edge e from the graph --- WAHT!?
+				// hmmm need to find other algorithm :/
+			}
+		}
+		*/
+		
+		// TODO daca e bine: foreach node setTop
+	}
+	
+	private void visit(Position n, LinkedList<Position> l) {
+		// if n has not been visited yet then
+		if (n.userVar == 0) {
+			// mark n as visited
+			n.userVar = 1;
+			
+			Collection<Position> pred = network.getPredecessors(n); 
+			//for each node m with an edge from n to m do
+			for (Iterator<Position> itPred = pred.iterator(); itPred.hasNext(); ) {
+				// visit(m)
+				visit(itPred.next(), l);
+			}
+			//add n to L
+			l.add(n);
+		}
 	}
 
 	/**
@@ -126,8 +176,9 @@ public class Environment {
 	 * @return A vector of all available positions.
 	 */
 	public final Vector<Position> getAdjacent(final Robot robot) {
-		Vector<Position> ret = new Vector<Position>();
-		// TODO
+		Position robPos = robot.getCurrentPosition();
+		Vector<Position> ret = 
+			new Vector<Position>(network.getNeighbors(robPos));
 		return ret;
 	}
 

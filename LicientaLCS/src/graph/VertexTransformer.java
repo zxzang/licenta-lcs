@@ -12,16 +12,18 @@ import edu.uci.ics.jung.io.graphml.NodeMetadata;
  */
 public class VertexTransformer implements Transformer<NodeMetadata, Position> {
 
-	private static final String nodeObstacle = "nodeObstacle";
+	private static final String nodeType = "nodeType";
 
 	@Override
 	public final Position transform(final NodeMetadata metadata) {
-		String property = metadata.getProperty(nodeObstacle);
+		String property = metadata.getProperty(nodeType);
 		Position ret;
-		if (property.equals("true")) {
-			ret = new Position(true);
+		if (property.equals("obstacle")) {
+			ret = new Position(Position.typeObstacle);
+		} else if (property.equals("final")) {
+			ret = new Position(Position.typeFinal);
 		} else {
-			ret = new Position(false);
+			ret = new Position(Position.typeNormal);
 		}
 		return ret;
 	}
