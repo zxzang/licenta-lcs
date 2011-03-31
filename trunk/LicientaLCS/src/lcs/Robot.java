@@ -61,6 +61,11 @@ public class Robot implements Runnable {
 					lastSteps.removeFirst();
 				env.makeAction(no, nextMove);
 				current = nextMove;
+				
+				//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
+				//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ si se va anula efectul benefic
+				current.givePositiveFeedback();
+				
 			}
 		}
 		
@@ -167,12 +172,14 @@ public class Robot implements Runnable {
 			 */
 			if (toBlock){				
 				nextMove.blockRoute(current);
+				current.blockRoute(nextMove);
+				current.giveNegativeFeedback();
 				aux.nR--;
 			}
 			
 			noARoutes = aux.nR;
 			
-			if (noARoutes <= 1 && toBlock) // there is one way .. the way back... block the position I say
+			if (noARoutes <= 1 && toBlock) // there is one way .. the way back. Block the position I say
 				toBlock = true;
 			else // blocked a route but others are available .. position stands
 				toBlock = false;
