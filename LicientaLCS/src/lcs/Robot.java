@@ -51,6 +51,7 @@ public class Robot implements Runnable {
 			else {
 				nextMove = null;
 				
+				//	I'll wait to move till I get a free position in which I can move
 				while (nextMove == null){
 					nextMove = getNextMove(adjacent);
 				}
@@ -63,8 +64,7 @@ public class Robot implements Runnable {
 			}
 		}
 		
-		System.out.println("Landed on the promised land!");
-			
+		System.out.println("Landed on the promised land!");			
 	}
 	
 	/**
@@ -138,6 +138,8 @@ public class Robot implements Runnable {
 	void removeDeadEnds(Vector<Position> adjacent){
 		Vector<Position> toRemove = new Vector<Position>();
 		// why? daca ai scoate direct ar da exceptie?
+		// pica la runtime .. am incercat intr-un lab si nu merge sa scoti un element din un vector cat timp
+		//	iterezi pe el - java thing
 		for(Position x:adjacent)
 			if (x.isDeadEnd())
 				toRemove.add(x);
@@ -146,27 +148,41 @@ public class Robot implements Runnable {
 	}
 	
 	void goBackNMark(){
+		// should I block the current node ?
 		boolean toBlock = true;
-		PositionNRoutes aux;
+		// used to stock next position on the road back and the number of routes for that position
+		PositionNRoutes aux; 
+		// the next position in my road back
 		Position nextMove;
+		// the no. of available routes of me current position
 		int noARoutes;		
-		
-		aux = lastSteps.removeLast();
-		nextMove = aux.pos;
-		noARoutes = aux.nR;			
 		
 		while (!lastSteps.isEmpty()){						
 			
-			if (toBlock){				
-				nextMove.blockRoute(current);
-				noARoutes --;
-			}
-			
 			aux = lastSteps.removeLast();
 			nextMove = aux.pos;
+
+			/*
+			 *  Part where I check out how to block certain routes
+			 */
+			if (toBlock){				
+				nextMove.blockRoute(current);
+				aux.nR--;
+			}
 			
-			if (noARoutes == 1);
+			noARoutes = aux.nR;
 			
+			if (noARoutes <= 1 && toBlock) // there is one way .. the way back... block the position I say
+				toBlock = true;
+			else // blocked a route but others are available .. position stands
+				toBlock = false;
+			
+			/*
+			 * Actual movement backwards
+			 */
+			
+			env.makeAction(no, nextMove);
+			current = nextMove;
 		}
 		
 		
