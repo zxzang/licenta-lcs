@@ -155,7 +155,8 @@ public class Position {
 	 * @param blocked - the position to be blocked.
 	 */
 	public final void blockRoute(Position blocked){
-		blockedRoutes.add(blocked);
+		if (!blockedRoutes.contains(blocked))
+			blockedRoutes.add(blocked);
 	}
 	
 	/**
