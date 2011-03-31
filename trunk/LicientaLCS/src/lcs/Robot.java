@@ -149,19 +149,23 @@ public class Robot implements Runnable {
 		boolean toBlock = true;
 		PositionNRoutes aux;
 		Position nextMove;
-		int noARoutes;
-		int noOCurrentRoutes = 1;
+		int noARoutes;		
 		
-		while (!lastSteps.isEmpty()){
+		aux = lastSteps.removeLast();
+		nextMove = aux.pos;
+		noARoutes = aux.nR;			
+		
+		while (!lastSteps.isEmpty()){						
+			
+			if (toBlock){				
+				nextMove.blockRoute(current);
+				noARoutes --;
+			}
+			
 			aux = lastSteps.removeLast();
 			nextMove = aux.pos;
-			noARoutes = aux.nR;			
 			
-			if (toBlock){
-				current.blockRoute(nextMove);
-				nextMove.blockRoute(current);
-				noOCurrentRoutes --;
-			}
+			if (noARoutes == 1);
 			
 		}
 		
