@@ -50,10 +50,8 @@ public class Environment {
 	 * @param pos - positions of the robots within the graph.
 	 * @param input - the filename from which the graph is to be read.
 	 */
-	public Environment(final Vector<Position> pos, final String input) {
-		this.robotPos = pos;
+	public Environment(final String input) {
 		this.agents = new Vector<Robot>();
-		this.sortTop();
 		
 		try {
 			this.getGraph(input);
@@ -67,7 +65,15 @@ public class Environment {
 					+ " the graph from " + input + ".");
 			System.exit(-1);
 		}
-		
+		//this.sortTop(); // XXX happy debuging
+	}
+	
+	/**
+	 * Set the vector that contains positions for the agents.
+	 * @param pos - the position vector.
+	 */
+	public void setRobotPositions(final Vector<Position> pos) {
+		this.robotPos = pos;
 	}
 	
 	/**
@@ -105,10 +111,11 @@ public class Environment {
 		// L - Empty list that will contain the sorted nodes
 		LinkedList<Position> l = new LinkedList<Position>();
 		// S - Set of all nodes with no incoming edges
+		
 		Collection<Position> c = network.getVertices();
 		for (Iterator<Position> p = c.iterator(); p.hasNext(); ) {
 			if (network.inDegree(p.next()) > 0)
-				p.remove(); // XXX will this work?!
+				p.remove(); // XXX will this work?! nope ... no it won't
 		}
 		
 		for (Iterator<Position> p = c.iterator(); p.hasNext(); ) {
@@ -132,6 +139,12 @@ public class Environment {
 		// TODO daca e bine: foreach node setTop
 	}
 	
+	/**
+	 * Part of the topological sort algorithm.
+	 * Recursive function that marks nodes.
+	 * @param n - the visited node.
+	 * @param l - the list of visited nodes.
+	 */
 	private void visit(Position n, LinkedList<Position> l) {
 		// if n has not been visited yet then
 		if (n.userVar == 0) {
@@ -180,6 +193,14 @@ public class Environment {
 		Vector<Position> ret = 
 			new Vector<Position>(network.getNeighbors(robPos));
 		return ret;
+	}
+	
+	/**
+	 * Gets the graph stored in the environment.
+	 * @return the internal graph.
+	 */
+	public final Graph<Position, Edge> getGraph() {
+		return this.network;
 	}
 
 	/**

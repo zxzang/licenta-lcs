@@ -18,6 +18,7 @@ public class EdgeTransformer implements Transformer<EdgeMetadata, Edge> {
 		String source = metadata.getSource();
 		String target = metadata.getTarget();
 		ret = new Edge(source, target);
+		ret.setName(metadata.getId());
 		return ret;
 	}
 

@@ -17,7 +17,12 @@ public class Edge {
 	 */
 	Position second;
 	String secondName;
-
+	
+	/**
+	 * To look pretty in gui.
+	 */
+	String name;
+	
 	/**
 	 * Basic constructor.
 	 * NOTE: not to be used yet.
@@ -45,5 +50,15 @@ public class Edge {
 	 */
 	public Edge() {
 	}
-
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	/**
+	 * For displaying.
+	 */
+	public String toString() {
+		return this.name;
+	}
 }
