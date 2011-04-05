@@ -174,5 +174,12 @@ public class Position {
 	public final void setDeadEnd(){
 		deadEnd = true;
 	}
+	
+	/**
+	 * Gives a string representation of the node.
+	 */
+	public String toString() {
+		return this.namePos;
+	}
 
 }

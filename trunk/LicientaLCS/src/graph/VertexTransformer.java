@@ -17,7 +17,9 @@ public class VertexTransformer implements Transformer<NodeMetadata, Position> {
 	@Override
 	public final Position transform(final NodeMetadata metadata) {
 		String property = metadata.getProperty(nodeType);
+		
 		Position ret;
+		
 		if (property.equals("obstacle")) {
 			ret = new Position(Position.typeObstacle);
 		} else if (property.equals("final")) {
@@ -25,6 +27,8 @@ public class VertexTransformer implements Transformer<NodeMetadata, Position> {
 		} else {
 			ret = new Position(Position.typeNormal);
 		}
+		
+		ret.setName(metadata.getId());
 		return ret;
 	}
 
