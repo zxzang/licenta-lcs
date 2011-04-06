@@ -4,9 +4,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 public class GraphWindowCloser implements WindowListener {
-	
-	public GraphWindowCloser() {
-	}
 
 	@Override
 	public void windowActivated(WindowEvent arg0) {

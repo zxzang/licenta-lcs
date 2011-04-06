@@ -51,6 +51,10 @@ public class Edge {
 	public Edge() {
 	}
 	
+	/**
+	 * Set the name with which the edge will be displayed.
+	 * @param name - to be displayed.
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}

@@ -3,6 +3,7 @@ package lcs;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -65,7 +66,7 @@ public class Environment {
 					+ " the graph from " + input + ".");
 			System.exit(-1);
 		}
-		//this.sortTop(); // XXX happy debuging
+		this.sortTop(); // XXX happy debuging
 	}
 	
 	/**
@@ -110,33 +111,27 @@ public class Environment {
 		// TODO remove stupid comments after testing code
 		// L - Empty list that will contain the sorted nodes
 		LinkedList<Position> l = new LinkedList<Position>();
+		
 		// S - Set of all nodes with no incoming edges
+		ArrayList<Position> c = new ArrayList<Position>(network.getVertices());
 		
-		Collection<Position> c = network.getVertices();
 		for (Iterator<Position> p = c.iterator(); p.hasNext(); ) {
-			if (network.inDegree(p.next()) > 0)
-				p.remove(); // XXX will this work?! nope ... no it won't
+			Position pos = p.next();
+			if (network.inDegree(pos) > 0)
+				p.remove();
 		}
 		
 		for (Iterator<Position> p = c.iterator(); p.hasNext(); ) {
-			this.visit(p.next(), l);
-		} 
-		
-		/*while (c.isEmpty() == false) {
-			Iterator<Position> it = c.iterator();
-			Position p = it.next();
-			it.remove();
-			l.add(p);
-			
-			Collection<Position> pred = network.getPredecessors(p); 
-			for (Iterator<Position> itPred = pred.iterator(); itPred.hasNext(); ) {
-				// XXX remove edge e from the graph --- WAHT!?
-				// hmmm need to find other algorithm :/
-			}
+			Position pos = p.next();
+			this.visit(pos, l);
 		}
-		*/
 		
 		// TODO daca e bine: foreach node setTop
+		int i = 0;
+		for (Iterator<Position> iter = l.iterator(); iter.hasNext(); i++) {
+			Position p = iter.next();
+			System.out.println(p + " " + i);
+		}
 	}
 	
 	/**
@@ -151,11 +146,12 @@ public class Environment {
 			// mark n as visited
 			n.userVar = 1;
 			
-			Collection<Position> pred = network.getPredecessors(n); 
+			Collection<Position> succ = network.getSuccessors(n); 
 			//for each node m with an edge from n to m do
-			for (Iterator<Position> itPred = pred.iterator(); itPred.hasNext(); ) {
+			for (Iterator<Position> itSucc = succ.iterator(); itSucc.hasNext(); ) {
+				Position m = itSucc.next();
 				// visit(m)
-				visit(itPred.next(), l);
+				visit(m, l);
 			}
 			//add n to L
 			l.add(n);
