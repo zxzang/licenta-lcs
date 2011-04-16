@@ -20,6 +20,17 @@ public class Position {
 	int pheromone;
 	
 	/**
+	 * The value of the reward left by one agent.
+	 * Ideally: (number of agents - 1) * reward > number of nodes 
+	 * 		logic : the robot will have to choose the position with the highest
+	 * 				(pheromone - distance between nodes) value
+	 * 				if we don't have the condition, the above difference between
+	 * 				the first and last node topologically sorted will always be
+	 * 				negative 
+	 */
+	int reward;
+	
+	/**
 	 * The blocked routes from this position.
 	 * A type of marking left by robots on the graph edges
 	 */
@@ -114,14 +125,14 @@ public class Position {
 	 * An agent can inform others that this position was beneficial.
 	 */
 	protected final void givePositiveFeedback() {
-		this.pheromone++;
+		this.pheromone += reward;
 	}
 
 	/**
 	 * An agent can inform others that this position was harmful.
 	 */
 	protected final void giveNegativeFeedback() {
-		this.pheromone--;
+		this.pheromone -= reward;
 	}
 
 	/**
