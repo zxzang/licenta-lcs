@@ -26,7 +26,7 @@ public class Position {
 	 * 				(pheromone - distance between nodes) value
 	 * 				if we don't have the condition, the above difference between
 	 * 				the first and last node topologically sorted will always be
-	 * 				negative 
+	 * 				negative hence it might never get chosen
 	 */
 	int reward;
 	
