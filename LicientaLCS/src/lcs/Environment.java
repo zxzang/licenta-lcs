@@ -48,7 +48,6 @@ public class Environment {
 
 	/**
 	 * Basic constructor.
-	 * @param pos - positions of the robots within the graph.
 	 * @param input - the filename from which the graph is to be read.
 	 */
 	public Environment(final String input) {
@@ -73,7 +72,7 @@ public class Environment {
 	 * Set the vector that contains positions for the agents.
 	 * @param pos - the position vector.
 	 */
-	public void setRobotPositions(final Vector<Position> pos) {
+	public final void setRobotPositions(final Vector<Position> pos) {
 		this.robotPos = pos;
 	}
 	
@@ -83,9 +82,10 @@ public class Environment {
 	 * @throws FileNotFoundException the file was not found.
 	 * @throws GraphIOException there was a problem reading the graph.
 	 */
-	private void getGraph(String filename) throws FileNotFoundException,
-			GraphIOException {
-		BufferedReader fileR = new BufferedReader(new FileReader(filename));
+	private void getGraph(final String filename) throws
+			FileNotFoundException, GraphIOException {
+		BufferedReader fileR = new BufferedReader(new
+			FileReader(filename));
 		
 		GraphTransformer graphTransformer = new GraphTransformer();
 		
@@ -93,13 +93,15 @@ public class Environment {
 
 		EdgeTransformer edgeTransformer = new EdgeTransformer();
 		
-		HyperEdgeTransformer hyperEdgeTransformer = new HyperEdgeTransformer();
+		HyperEdgeTransformer hyperEdgeTransformer = new
+			HyperEdgeTransformer();
 		
 		GraphMLReader2<Graph<Position, Edge>, Position, Edge>
 			graphReader = new
-			GraphMLReader2<Graph<Position, Edge>, Position, Edge> (
-					fileR, graphTransformer, vertexTransformer,
-			       edgeTransformer, hyperEdgeTransformer);
+			GraphMLReader2<Graph<Position, Edge>, Position, Edge>(
+					fileR, graphTransformer,
+					vertexTransformer, edgeTransformer,
+					hyperEdgeTransformer);
 		
 		this.network = graphReader.readGraph();
 	}
@@ -113,22 +115,25 @@ public class Environment {
 		LinkedList<Position> l = new LinkedList<Position>();
 		
 		// S - Set of all nodes with no incoming edges
-		ArrayList<Position> c = new ArrayList<Position>(network.getVertices());
+		ArrayList<Position> c = new ArrayList<Position>(
+				network.getVertices());
 		
-		for (Iterator<Position> p = c.iterator(); p.hasNext(); ) {
+		for (Iterator<Position> p = c.iterator(); p.hasNext();) {
 			Position pos = p.next();
-			if (network.inDegree(pos) > 0)
+			if (network.inDegree(pos) > 0) {
 				p.remove();
+			}
 		}
 		
-		for (Iterator<Position> p = c.iterator(); p.hasNext(); ) {
+		for (Iterator<Position> p = c.iterator(); p.hasNext();) {
 			Position pos = p.next();
 			this.visit(pos, l);
 		}
 		
 		// TODO daca e bine: foreach node setTop
 		int i = 0;
-		for (Iterator<Position> iter = l.iterator(); iter.hasNext(); i++) {
+		for (Iterator<Position> iter = l.iterator(); iter.hasNext();
+				i++) {
 			Position p = iter.next();
 			System.out.println(p + " " + i);
 		}
@@ -140,15 +145,16 @@ public class Environment {
 	 * @param n - the visited node.
 	 * @param l - the list of visited nodes.
 	 */
-	private void visit(Position n, LinkedList<Position> l) {
+	private void visit(final Position n, final LinkedList<Position> l) {
 		// if n has not been visited yet then
 		if (n.userVar == 0) {
 			// mark n as visited
 			n.userVar = 1;
 			
-			Collection<Position> succ = network.getSuccessors(n); 
+			Collection<Position> succ = network.getSuccessors(n);
 			//for each node m with an edge from n to m do
-			for (Iterator<Position> itSucc = succ.iterator(); itSucc.hasNext(); ) {
+			for (Iterator<Position> itSucc = succ.iterator();
+					itSucc.hasNext();) {
 				Position m = itSucc.next();
 				// visit(m)
 				visit(m, l);
@@ -186,7 +192,7 @@ public class Environment {
 	 */
 	public final Vector<Position> getAdjacent(final Robot robot) {
 		Position robPos = robot.getCurrentPosition();
-		Vector<Position> ret = 
+		Vector<Position> ret =
 			new Vector<Position>(network.getNeighbors(robPos));
 		return ret;
 	}

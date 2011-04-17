@@ -3,7 +3,10 @@ package lcsgui;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-public class GraphWindowCloser implements WindowListener {
+/**
+ * A simple WindowListner that ends the program when the window is closed.
+ */
+public final class GraphWindowCloser implements WindowListener {
 
 	@Override
 	public void windowActivated(WindowEvent arg0) {

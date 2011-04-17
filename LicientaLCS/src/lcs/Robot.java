@@ -1,6 +1,9 @@
 package lcs;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Vector;
 
 /**
  * 
@@ -9,9 +12,11 @@ import java.util.*;
  */
 public class Robot implements Runnable {
 
-	// Class that associates a certain position with the number of available routes
-	//		that go out of it
-	class PositionNRoutes{
+	/**
+	 * Class that associates a certain position with the number
+	 * of available routes that go out of it.
+	 */
+	static class PositionNRoutes{
 		Position pos;
 		int nR;
 		public PositionNRoutes(Position x, int y){
@@ -20,14 +25,16 @@ public class Robot implements Runnable {
 		}
 	}
 
-	// Class that associates a certain position with the its reward	
-	class PositionNReward{
+	/**
+	 * Class that associates a certain position with the its reward.
+	 */
+	static class PositionNReward{
 		Position pos;
 		int reward;
 		public PositionNReward(Position x, int y){
 			pos = x;
 			reward = y;
-		}		
+		}
 	}
 	
 	Position current;
@@ -42,8 +49,8 @@ public class Robot implements Runnable {
 	 * 		1  -  Only wants to move on the best position
 	 * 		2  -  Will move on the best position available
 	 */
-	public static final int bestPosition = 1;
-	public static final int bestAvailable = 2;
+	public static final int BESTPOSITION = 1;
+	public static final int BESTAVAILABLE = 2;
 	int type;
 	
 	
@@ -81,7 +88,7 @@ public class Robot implements Runnable {
 			}
 		}
 		
-		System.out.println("Landed on the promised land!");			
+		System.out.println("Landed on the promised land!");
 	}
 	
 	/**
@@ -90,7 +97,7 @@ public class Robot implements Runnable {
 	 * @param t - type of robot
 	 */
 	public Robot(int n, int t, int nSteps){
-		no = n;		
+		no = n;
 		type = t;
 		noStepsBack = nSteps;
 		lastSteps = new LinkedList<PositionNRoutes>();
@@ -108,25 +115,27 @@ public class Robot implements Runnable {
 	 * Sets the destination of the agent
 	 */
 	public void setCurrentGoal( Position stop){
-		target = stop;		
+		target = stop;
 	}
 	
 	/*
 	 * Sets the start position of the agent
 	 */
 	public void setStartPosition(Position start){
-		current = start;		
+		current = start;
 	}
 	
-	/*
-	 * 
+	/**
+	 * Returns the best Position to take out of the given neighbors.
+	 * @param available - a vector of potential successors.
+	 * @return The best position to go to.
 	 */
 	Position getNextMove(Vector<Position> available){
 		switch (this.type) {
-		case bestPosition:
+		case BESTPOSITION:
 			// Robot care vrea neaparat sa se miste pe cea mai buna pozitie
 			return getNextMoveAbsolute(available);
-		case bestAvailable:
+		case BESTAVAILABLE:
 			// Robotul decide sa urmeze cea mai buna cale libera
 			return getNextMoveAvailable(available);
 		default:
@@ -142,19 +151,29 @@ public class Robot implements Runnable {
 		int tempReward;
 		
 		// If I fail to acquire a position I will recompute the bestPosition until it is available to me
-		//		logic: the bestPosition might dynamically change - what is good now might not be good 2 steps from now
-		//				when it will be available
+		// logic: the bestPosition might dynamically change - what is good now might
+		//	      not be good 2 steps from now when it will be available
 		while (true){
 			for (Position i: available){
-				tempReward = i.getFeedback() - (i.getTopologicPostion() - target.getTopologicPostion());
+				tempReward = i.getFeedback() -
+					(i.getTopologicPostion() - target.getTopologicPostion());
 				if (tempReward > bestReward){
 					bestReward = tempReward;
 					bestPos = i;
-				}				
+				}
 			}
+			
+			/* not sure I'm licking this
+			 * poate ar trebui sa intoarca o pozitie si sa faca acquire
+			 * in functia principala?
+			 * toti roboti o sa comunice cu env. asa vad eu
+			 * nu o sa fie unul mai rapid ca altul
+			 * o sa fie sincronizati printr-o bariera.
+			 * discuss.
+			 */
 			if (bestPos.sem.tryAcquire())
-				return bestPos;		
-		}		
+				return bestPos;
+		}
 	}
 	
 	Position getNextMoveAvailable(Vector<Position> available){
@@ -171,7 +190,7 @@ public class Robot implements Runnable {
 					if (o1.reward == o2.reward)
 						return 0;
 					return -1;
-				}			
+				}
 			});
 		
 		//	Maybe all of my available positions are taken
@@ -182,7 +201,8 @@ public class Robot implements Runnable {
 			// The order is from greatest to lowest, so the comparator must be implemented like below			 
 	
 			for (Position i: available){
-				tempReward = i.getFeedback() - (i.getTopologicPostion() - target.getTopologicPostion());
+				tempReward = i.getFeedback() -
+					(i.getTopologicPostion() - target.getTopologicPostion());
 				queueElement = new PositionNReward(i, tempReward);
 				posQueue.add(queueElement);
 			}
@@ -207,9 +227,6 @@ public class Robot implements Runnable {
 	
 	void removeDeadEnds(Vector<Position> adjacent){
 		Vector<Position> toRemove = new Vector<Position>();
-		// why? daca ai scoate direct ar da exceptie?
-		// pica la runtime .. am incercat intr-un lab si nu merge sa scoti un element din un vector cat timp
-		//	iterezi pe el - java thing
 		for(Position x:adjacent)
 			if (x.isDeadEnd())
 				toRemove.add(x);
@@ -227,7 +244,7 @@ public class Robot implements Runnable {
 		// the no. of available routes at me current position
 		int noARoutes;		
 		
-		while (!lastSteps.isEmpty()){						
+		while (!lastSteps.isEmpty()){
 			
 			aux = lastSteps.removeLast();
 			nextMove = aux.pos;
@@ -235,7 +252,7 @@ public class Robot implements Runnable {
 			/*
 			 *  Part where I check out how to block certain routes
 			 */
-			if (toBlock){				
+			if (toBlock){
 				nextMove.blockRoute(current);
 				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
 				current.blockRoute(nextMove);
@@ -260,10 +277,5 @@ public class Robot implements Runnable {
 		
 		
 	}
-	
-	
-	
-	
-	
 	
 }
