@@ -124,6 +124,9 @@ public class Robot implements Runnable {
 	}
 	Position getNextMoveAbsolute(Vector<Position> available){
 		System.out.println("eu " + Thread.currentThread() + "cer mutare absolute best ");
+		for (Position i: available){
+			
+		}
 		return null;
 	}
 	
@@ -159,7 +162,7 @@ public class Robot implements Runnable {
 		PositionNRoutes aux; 
 		// the next position in my road back
 		Position nextMove;
-		// the no. of available routes of me current position
+		// the no. of available routes at me current position
 		int noARoutes;		
 		
 		while (!lastSteps.isEmpty()){						
