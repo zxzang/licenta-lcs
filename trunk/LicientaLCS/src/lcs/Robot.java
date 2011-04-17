@@ -9,6 +9,8 @@ import java.util.*;
  */
 public class Robot implements Runnable {
 
+	// Class that associates a certain position with the number of available routes
+	//		that go out of it
 	class PositionNRoutes{
 		Position pos;
 		int nR;
@@ -16,6 +18,16 @@ public class Robot implements Runnable {
 			pos = x;
 			nR = y;
 		}
+	}
+
+	// Class that associates a certain position with the its reward	
+	class PositionNReward{
+		Position pos;
+		int reward;
+		public PositionNReward(Position x, int y){
+			pos = x;
+			reward = y;
+		}		
 	}
 	
 	Position current;
@@ -52,20 +64,20 @@ public class Robot implements Runnable {
 				nextMove = null;
 				
 				//	I'll wait to move till I get a free position in which I can move
-				while (nextMove == null){
-					nextMove = getNextMove(adjacent);
-				}
+				nextMove = getNextMove(adjacent);
+				
 				
 				lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 				if (lastSteps.size() >= noStepsBack)
 					lastSteps.removeFirst();
 				env.makeAction(no, nextMove);
+				
+				current.sem.release();
 				current = nextMove;
 				
 				//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
 				//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ si se va anula efectul benefic
-				current.givePositiveFeedback();
-				
+				current.givePositiveFeedback();				
 			}
 		}
 		
@@ -122,17 +134,67 @@ public class Robot implements Runnable {
 			return null;
 		}
 	}
+	
 	Position getNextMoveAbsolute(Vector<Position> available){
 		System.out.println("eu " + Thread.currentThread() + "cer mutare absolute best ");
-		for (Position i: available){
-			
-		}
-		return null;
+		Position bestPos = null;
+		int bestReward = -Integer.MIN_VALUE;
+		int tempReward;
+		
+		// If I fail to acquire a position I will recompute the bestPosition until it is available to me
+		//		logic: the bestPosition might dynamically change - what is good now might not be good 2 steps from now
+		//				when it will be available
+		while (true){
+			for (Position i: available){
+				tempReward = i.getFeedback() - (i.getTopologicPostion() - target.getTopologicPostion());
+				if (tempReward > bestReward){
+					bestReward = tempReward;
+					bestPos = i;
+				}				
+			}
+			if (bestPos.sem.tryAcquire())
+				return bestPos;		
+		}		
 	}
 	
 	Position getNextMoveAvailable(Vector<Position> available){
 		System.out.println("eu " + Thread.currentThread() + "cer mutare best available");
-		return null;
+		int tempReward;
+		PositionNReward queueElement;
+		Position nextMove;
+		PriorityQueue<PositionNReward> posQueue = 
+			new PriorityQueue<PositionNReward>(11, new Comparator<PositionNReward>() {			
+				@Override
+				public int compare(PositionNReward o1, PositionNReward o2) {
+					if (o1.reward < o2.reward)
+						return 1;
+					if (o1.reward == o2.reward)
+						return 0;
+					return -1;
+				}			
+			});
+		
+		//	Maybe all of my available positions are taken
+		//	If that happens, priorities might change until my next iteration through 
+		//		the positions, so I might as well compute them again
+		while (true){
+			// Priority queue used to store the order of positions
+			// The order is from greatest to lowest, so the comparator must be implemented like below			 
+	
+			for (Position i: available){
+				tempReward = i.getFeedback() - (i.getTopologicPostion() - target.getTopologicPostion());
+				queueElement = new PositionNReward(i, tempReward);
+				posQueue.add(queueElement);
+			}
+			
+			while (!posQueue.isEmpty()){
+				nextMove = posQueue.poll().pos;
+				if (nextMove.sem.tryAcquire()){
+					return nextMove;
+				}
+			}
+		}
+		
 	}
 	
 	/**
@@ -175,6 +237,7 @@ public class Robot implements Runnable {
 			 */
 			if (toBlock){				
 				nextMove.blockRoute(current);
+				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
 				current.blockRoute(nextMove);
 				current.giveNegativeFeedback();
 				aux.nR--;
@@ -183,7 +246,7 @@ public class Robot implements Runnable {
 			noARoutes = aux.nR;
 			
 			if (noARoutes <= 1 && toBlock) // there is one way .. the way back. Block the position I say
-				toBlock = true;
+				toBlock = true;			
 			else // blocked a route but others are available .. position stands
 				toBlock = false;
 			
