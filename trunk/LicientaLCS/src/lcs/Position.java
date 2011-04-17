@@ -21,12 +21,12 @@ public class Position {
 	
 	/**
 	 * The value of the reward left by one agent.
-	 * Ideally: (number of agents - 1) * reward > number of nodes 
-	 * 		logic : the robot will have to choose the position with the highest
-	 * 				(pheromone - distance between nodes) value
-	 * 				if we don't have the condition, the above difference between
-	 * 				the first and last node topologically sorted will always be
-	 * 				negative hence it might never get chosen
+	 * Ideally: (number of agents - 1) * reward > number of nodes
+	 * Logic : the robot will have to choose the position with the highest
+	 *         (pheromone - distance between nodes) value
+	 *         if we don't have the condition, the above difference between
+	 *         the first and last node topologically sorted will always be
+	 *         negative hence it might never get chosen
 	 */
 	int reward;
 	
@@ -43,12 +43,22 @@ public class Position {
 	boolean deadEnd;
 
 	/**
-	 * Indicates if there is a physical, unmovable obstacle within
-	 * this place.
+	 * The current position can be traversed.
 	 */
-	public static final int typeNormal = 0;
-	public static final int typeObstacle = 1;
-	public static final int typeFinal = 2;
+	public static final int TYPENORMAL = 0;
+	/**
+	 * The current position is an obstacle.
+	 * Consider for deletion.
+	 */
+	public static final int TYPEOBSTACLE = 1;
+	/**
+	 * The current position is the one desired by the agents.
+	 */
+	public static final int TYPEFINAL = 2;
+	
+	/**
+	 * The type of the current position.
+	 */
 	int type;
 
 	/**
@@ -77,22 +87,22 @@ public class Position {
 
 	/**
 	 * Basic constructor.
-	 * @param isObstacle - specifies if this position is a obstacle.
+	 * @param type - specifies the type of the Position.
 	 */
 	public Position(final int type) {
 		this.type = type;
 		switch (this.type) {
-		case typeFinal:
+		case TYPEFINAL:
 			this.sem = new Semaphore(1, true);
 			this.blockedRoutes = new LinkedList<Position>();
 			this.deadEnd = false;
 			break;
-		case typeNormal:
+		case TYPENORMAL:
 			this.sem = new Semaphore(1, true);
 			this.blockedRoutes = new LinkedList<Position>();
 			this.deadEnd = false;
 			break;
-		case typeObstacle:
+		case TYPEOBSTACLE:
 			break;
 		default:
 			System.err.println("[Position.Position]Unknown option " + this.type);
@@ -165,9 +175,10 @@ public class Position {
 	 * Adds a Position to the blocked vector.
 	 * @param blocked - the position to be blocked.
 	 */
-	public final void blockRoute(Position blocked){
-		if (!blockedRoutes.contains(blocked))
+	public final void blockRoute(final Position blocked){
+		if (!blockedRoutes.contains(blocked)) {
 			blockedRoutes.add(blocked);
+		}
 	}
 	
 	/**
@@ -178,18 +189,26 @@ public class Position {
 		return blockedRoutes;
 	}
 	
+	/**
+	 * Specifies if this position has no possible successors.
+	 * @return True if it is a dead end, false otherwise.
+	 */
 	public final boolean isDeadEnd(){
 		return deadEnd;
 	}
 	
+	/**
+	 * Marks the current position as a dead end.
+	 */
 	public final void setDeadEnd(){
 		deadEnd = true;
 	}
 	
 	/**
 	 * Gives a string representation of the node.
+	 * @return The name of the Position.
 	 */
-	public String toString() {
+	public final String toString() {
 		return this.namePos;
 	}
 

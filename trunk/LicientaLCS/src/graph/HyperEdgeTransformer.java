@@ -10,7 +10,7 @@ import edu.uci.ics.jung.io.graphml.HyperEdgeMetadata;
  * @author Dumitrescu Iustin
  *
  */
-public class HyperEdgeTransformer implements 
+public class HyperEdgeTransformer implements
 		Transformer<HyperEdgeMetadata, Edge> {
 
 	@Override

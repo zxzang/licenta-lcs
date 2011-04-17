@@ -12,35 +12,53 @@ import edu.uci.ics.jung.visualization.BasicVisualizationServer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
-public class GraphFrame extends JFrame{
+/**
+ * A gui for the {@link Environment} type.
+ */
+public class GraphFrame extends JFrame {
 	/**
 	 * Serial Version UID.
 	 * Eclipse wouldn't shut up about it.
 	 */
 	private static final long serialVersionUID = 4323232456487666646L;
 	
+	/**
+	 * The {@link Environment} to be displayed.
+	 */
 	private Environment env;
-	static final int width = 800;
-	static final int height = 600;
 	
-	public GraphFrame(Environment e) {
+	/**
+	 * The width of the frame.
+	 */
+	static final int WIDTH = 800;
+	
+	/**
+	 * The height of the frame.
+	 */
+	static final int HEIGHT = 600;
+	
+	/**
+	 * Constructor for the class.
+	 * @param e - the {@link Environment} to be displayed.
+	 */
+	public GraphFrame(final Environment e) {
 		super("LCS System");
 		this.env = e;
 		
 		Layout<lcs.Position, Edge> layout =
 			new ISOMLayout<lcs.Position, Edge>(this.env.getGraph());
-		layout.setSize(new Dimension(width, height));
+		layout.setSize(new Dimension(WIDTH, HEIGHT));
 		
-		BasicVisualizationServer<lcs.Position, Edge> vv = 
-			new BasicVisualizationServer<lcs.Position, Edge>(layout);
-		vv.setPreferredSize(new Dimension(width, height));
+		BasicVisualizationServer<lcs.Position, Edge> vv = new
+			BasicVisualizationServer<lcs.Position, Edge>(layout);
+		vv.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<lcs.Position>());
 		vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<Edge>());
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		
-		this.getContentPane().add(vv); 
+		this.getContentPane().add(vv);
 		
-		this.setBounds(0, 0, width, height);
+		this.setBounds(0, 0, WIDTH, HEIGHT);
 		this.addWindowListener(new GraphWindowCloser());
 		this.setVisible(true);
 	}
