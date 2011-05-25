@@ -1,6 +1,5 @@
 package lcs;
 
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
@@ -28,12 +27,22 @@ public class Robot implements Runnable {
 	/**
 	 * Class that associates a certain position with the its reward.
 	 */
-	static class PositionNReward{
+	static class PositionNReward implements Comparable<PositionNReward>{
 		Position pos;
 		int reward;
 		public PositionNReward(Position x, int y){
 			pos = x;
 			reward = y;
+		}
+		
+		@Override
+		public int compareTo(PositionNReward o) {
+			//return o.reward - this.reward;
+			if (this.reward < o.reward)
+				return 1;
+			if (this.reward == o.reward)
+				return 0;
+			return -1;
 		}
 	}
 	
@@ -43,6 +52,7 @@ public class Robot implements Runnable {
 	LinkedList<PositionNRoutes> lastSteps;
 	int noStepsBack;
 	int no;
+	private String name;
 	
 	/**
 	 * 	Robot type
@@ -60,14 +70,13 @@ public class Robot implements Runnable {
 		Position nextMove = null;
 		Vector<Position> adjacent;
 		
-		while (current != target){
+		while (current != target) {
 			
 			adjacent = env.getAdjacent(this);
 			removeDeadEnds(adjacent);
 			if (adjacent.size() == 1){ // we're stuck
 				goBackNMark();
-			}
-			else {
+			} else {
 				nextMove = null;
 				
 				//	I'll wait to move till I get a free position in which I can move
@@ -93,12 +102,13 @@ public class Robot implements Runnable {
 	
 	/**
 	 * Basic constructor
-	 * @param n - robot number
-	 * @param t - type of robot
+	 * @param robotNum - robot number
+	 * @param type - type of robot
+	 * @param nSteps - number of steps to backtrack.
 	 */
-	public Robot(int n, int t, int nSteps){
-		no = n;
-		type = t;
+	public Robot(int robotNum, int type, int nSteps){
+		no = robotNum;
+		this.type = type;
 		noStepsBack = nSteps;
 		lastSteps = new LinkedList<PositionNRoutes>();
 	}
@@ -126,6 +136,25 @@ public class Robot implements Runnable {
 	}
 	
 	/**
+	 * Gives the robot a name.
+	 * @param name - the string to be associated.
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	/**
+	 * Returns the name of the robot.
+	 * If the name isn't set it will return the currentThread.
+	 * @return a string representation of the robot.
+	 */
+	public String getName() {
+		if (this.name == null)
+			return Thread.currentThread().toString();
+		return this.name;
+	}
+	
+	/**
 	 * Returns the best Position to take out of the given neighbors.
 	 * @param available - a vector of potential successors.
 	 * @return The best position to go to.
@@ -145,7 +174,7 @@ public class Robot implements Runnable {
 	}
 	
 	Position getNextMoveAbsolute(Vector<Position> available){
-		System.out.println("eu " + Thread.currentThread() + "cer mutare absolute best ");
+		System.out.println("eu " + getName() + "cer mutare absolute best ");
 		Position bestPos = null;
 		int bestReward = -Integer.MIN_VALUE;
 		int tempReward;
@@ -177,21 +206,12 @@ public class Robot implements Runnable {
 	}
 	
 	Position getNextMoveAvailable(Vector<Position> available){
-		System.out.println("eu " + Thread.currentThread() + "cer mutare best available");
+		System.out.println("eu " + getName() + "cer mutare best available");
 		int tempReward;
 		PositionNReward queueElement;
 		Position nextMove;
-		PriorityQueue<PositionNReward> posQueue = 
-			new PriorityQueue<PositionNReward>(11, new Comparator<PositionNReward>() {			
-				@Override
-				public int compare(PositionNReward o1, PositionNReward o2) {
-					if (o1.reward < o2.reward)
-						return 1;
-					if (o1.reward == o2.reward)
-						return 0;
-					return -1;
-				}
-			});
+		PriorityQueue<PositionNReward> posQueue =
+			new PriorityQueue<PositionNReward>(11);
 		
 		//	Maybe all of my available positions are taken
 		//	If that happens, priorities might change until my next iteration through 

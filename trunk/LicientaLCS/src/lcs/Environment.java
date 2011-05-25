@@ -13,9 +13,7 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.io.GraphIOException;
 import edu.uci.ics.jung.io.graphml.GraphMLReader2;
 import graph.EdgeTransformer;
-import graph.GraphTransformer;
 import graph.HyperEdgeTransformer;
-import graph.VertexTransformer;
 
 /**
  * Used to synchronize the agents and give them the input they need.
@@ -44,6 +42,11 @@ public class Environment {
 	 */
 	Graph<Position, Edge> network;
 	
+	/**
+	 * The number of steps a robot will backtrack.
+	 */
+	protected int stepsBack = 10;
+	
 	// TODO consider adding a barrier for sync + a sync function
 
 	/**
@@ -66,8 +69,37 @@ public class Environment {
 			System.exit(-1);
 		}
 		this.sortTop(); // XXX happy debuging
+		this.addAgents();
 	}
 	
+	private void addAgents() {
+		int n = 0;
+		Collection<Position> verts = network.getVertices();
+		this.agents = new Vector<Robot>();
+		
+		/* for each position */
+		for (Position p : verts) {
+			
+			if (p.robotNames == null)
+				continue;
+			
+			/* for each stored robot name */
+			for (String name : p.robotNames) {
+				// TODO ponder .. cum selectez diferite tipuri?
+				Robot r = new Robot(n, Robot.BESTAVAILABLE, stepsBack);
+				r.setName(name);
+				r.setCurrentGoal(this.targetPosition);
+				r.setStartPosition(p);
+				r.setEnvironment(this);
+				this.agents.add(r);
+				n++;
+			}
+			
+			p.robotNames = null;
+		}
+		
+	}
+
 	/**
 	 * Set the vector that contains positions for the agents.
 	 * @param pos - the position vector.
@@ -87,7 +119,7 @@ public class Environment {
 		BufferedReader fileR = new BufferedReader(new
 			FileReader(filename));
 		
-		GraphTransformer graphTransformer = new GraphTransformer();
+		GraphTransformer graphTransformer = new GraphTransformer(this);
 		
 		VertexTransformer vertexTransformer = new VertexTransformer();
 
@@ -131,12 +163,12 @@ public class Environment {
 		}
 		
 		// TODO daca e bine: foreach node setTop
-		int i = 0;
+		/*int i = 0;
 		for (Iterator<Position> iter = l.iterator(); iter.hasNext();
 				i++) {
 			Position p = iter.next();
 			System.out.println(p + " " + i);
-		}
+		}*/
 	}
 	
 	/**
@@ -171,7 +203,7 @@ public class Environment {
 	public final void addAgent(final Robot robot) {
 		robot.setCurrentGoal(this.targetPosition);
 		robot.setEnvironment(this);
-		this.agents.add(robot); // TODO add current position
+		this.agents.add(robot); // TODO consider removing
 	}
 
 	/**
@@ -213,6 +245,7 @@ public class Environment {
 	 */
 	public final int makeAction(final int robot, final Position dst) {
 		// TODO
+		System.out.println("[Environment]makeAction");
 		return 0;
 	}
 

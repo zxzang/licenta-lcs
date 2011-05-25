@@ -1,7 +1,5 @@
-package graph;
+package lcs;
 
-import lcs.Edge;
-import lcs.Position;
 
 import org.apache.commons.collections15.Transformer;
 
@@ -19,14 +17,34 @@ import edu.uci.ics.jung.io.graphml.GraphMetadata.EdgeDefault;
 public class GraphTransformer implements
 		Transformer<GraphMetadata, Graph<Position, Edge>> {
 
+	private static final String StepsBack = "noStepsBack";
+	
+	Environment env;
+	
 	@Override
 	public final Graph<Position, Edge> transform(
 			final GraphMetadata metadata) {
+		
+		String stepsBack;
+		stepsBack = metadata.getProperty(StepsBack);
+		
+		if (stepsBack != null) {
+			int steps;
+			try {
+				steps = Integer.parseInt(stepsBack);
+				env.stepsBack = steps;
+			} catch (NumberFormatException e) {}
+		}
+		
 		if (metadata.getEdgeDefault().equals(EdgeDefault.DIRECTED)) {
 			return new DirectedSparseGraph<Position, Edge>();
 		} else {
 			return new UndirectedSparseGraph<Position, Edge>();
 		}
+	}
+	
+	public GraphTransformer(Environment env) {
+		this.env = env;
 	}
 
 }

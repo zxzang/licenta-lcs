@@ -84,7 +84,12 @@ public class Position {
 	 * Can be used for topological sort.
 	 */
 	public int userVar;
-
+	
+	/**
+	 * Used by the VertexTransformer to store names of robots to be added.
+	 */
+	public LinkedList<String> robotNames;
+	
 	/**
 	 * Basic constructor.
 	 * @param type - specifies the type of the Position.
@@ -130,7 +135,17 @@ public class Position {
 	public final String getName() {
 		return this.namePos;
 	}
-
+	
+	/**
+	 * Used by the VertexTransformer to add a name to the position.
+	 * @param name - the name of the robot.
+	 */
+	protected void addRobot(String name) {
+		if (this.robotNames == null)
+			robotNames = new LinkedList<String>();
+		robotNames.add(name);
+	}
+	
 	/**
 	 * An agent can inform others that this position was beneficial.
 	 */
