@@ -4,21 +4,27 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 	
+	<key id="noStepsBack" for="graph" attr.name="noStepsBack" attr.type="string"/>
+	
 	<key id="nodeType" for="node" attr.name="nodeType" attr.type="string">
 		<default>normal</default>
 	</key>
 	
-	<!--
-	<key id="nameEdge" for="edge" attr.name="relation" attr.type="string">
-		<default>relation</default>
-	</key>
-	-->
+	<key id="robot1" for="node" attr.name="robot" attr.type="string"/>
+	<key id="robot2" for="node" attr.name="robot" attr.type="string"/>
+	<key id="robot3" for="node" attr.name="robot" attr.type="string"/>
 	
 	<graph id="G" edgedefault="directed">
+		<data key="noStepsBack">10</data>
+	
 		<!-- nodes -->
-		
-		<node id="c0"/>
-		<node id="c1"/>
+		<node id="c0">
+			<data key="robot1">bender</data>
+			<data key="robot2">r2d2</data>
+		</node>
+		<node id="c1">
+			<data key="robot3">data</data>
+		</node>
 		<node id="c2"/>
 		<node id="c3"/>
 		<node id="c4"/>
