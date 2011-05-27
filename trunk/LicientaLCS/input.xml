@@ -20,10 +20,10 @@
 		<!-- nodes -->
 		<node id="c0">
 			<data key="robot1">bender</data>
-			<data key="robot2">r2d2</data>
+			<!--  <data key="robot2">r2d2</data>-->
 		</node>
 		<node id="c1">
-			<data key="robot3">data</data>
+			<!-- <data key="robot3">data</data> -->
 		</node>
 		<node id="c2"/>
 		<node id="c3"/>

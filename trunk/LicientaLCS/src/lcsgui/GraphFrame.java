@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import lcs.Edge;
 import lcs.Environment;
-import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout2;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
@@ -30,12 +30,12 @@ public class GraphFrame extends JFrame {
 	/**
 	 * The width of the frame.
 	 */
-	static final int WIDTH = 800;
+	static final int WIDTH = 1024;
 	
 	/**
 	 * The height of the frame.
 	 */
-	static final int HEIGHT = 600;
+	static final int HEIGHT = 800;
 	
 	/**
 	 * Constructor for the class.
@@ -46,7 +46,7 @@ public class GraphFrame extends JFrame {
 		this.env = e;
 		
 		Layout<lcs.Position, Edge> layout =
-			new ISOMLayout<lcs.Position, Edge>(this.env.getGraph());
+			new FRLayout2<lcs.Position, Edge>(this.env.getGraph());
 		layout.setSize(new Dimension(WIDTH, HEIGHT));
 		
 		BasicVisualizationServer<lcs.Position, Edge> vv = new
