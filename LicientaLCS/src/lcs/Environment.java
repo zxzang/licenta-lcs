@@ -68,10 +68,31 @@ public class Environment {
 					+ " the graph from " + input + ".");
 			System.exit(-1);
 		}
+		
+		this.getTarget();
 		this.sortTop(); // XXX happy debuging
 		this.addAgents();
+		
+		this.setRobotPositions();
+		
+		this.startAgents();
 	}
 	
+	/**
+	 * Searches through the vertices for the one marked as target.
+	 */
+	private void getTarget() {
+		for (Position p : network.getVertices()) {
+			if (p.type == Position.TYPEFINAL) {
+				this.targetPosition = p;
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
 	private void addAgents() {
 		int n = 0;
 		Collection<Position> verts = network.getVertices();
@@ -98,6 +119,16 @@ public class Environment {
 			p.robotNames = null;
 		}
 		
+	}
+	
+	/**
+	 * Initiates the robotPos vector.
+	 */
+	private void setRobotPositions() {
+		this.robotPos = new Vector<Position>(this.agents.size());
+		for (Robot r : agents) {
+			robotPos.add(r.getCurrentPosition());
+		}
 	}
 
 	/**
@@ -163,12 +194,12 @@ public class Environment {
 		}
 		
 		// TODO daca e bine: foreach node setTop
-		/*int i = 0;
-		for (Iterator<Position> iter = l.iterator(); iter.hasNext();
-				i++) {
+		int i = 0;
+		for (Iterator<Position> iter = l.iterator(); iter.hasNext(); i++) {
 			Position p = iter.next();
-			System.out.println(p + " " + i);
-		}*/
+			//System.out.println(p + " " + i);
+			p.setTopologicPostion(i);
+		}
 	}
 	
 	/**
@@ -205,7 +236,16 @@ public class Environment {
 		robot.setEnvironment(this);
 		this.agents.add(robot); // TODO consider removing
 	}
-
+	
+	/**
+	 * Starts all agents.
+	 */
+	public final void startAgents() {
+		for (Robot r : agents) {
+			r.run();
+		}
+	}
+	
 	/**
 	 * Gets all adjacent positions for the specified agent.
 	 * This includes anything but obstacles.
@@ -224,8 +264,15 @@ public class Environment {
 	 */
 	public final Vector<Position> getAdjacent(final Robot robot) {
 		Position robPos = robot.getCurrentPosition();
-		Vector<Position> ret =
-			new Vector<Position>(network.getNeighbors(robPos));
+		LinkedList<Edge> outEdges = new LinkedList<Edge>(network.getOutEdges(robPos));
+		/*Vector<Position> ret =
+			new Vector<Position>(network.getNeighbors(robPos));*/
+		Vector<Position> ret = new Vector<Position>(outEdges.size());
+		
+		for (Edge e : outEdges) {
+			ret.add(network.getOpposite(robPos, e));
+		}
+		
 		return ret;
 	}
 	
@@ -244,8 +291,13 @@ public class Environment {
 	 * @return 0 / 1
 	 */
 	public final int makeAction(final int robot, final Position dst) {
-		// TODO
 		System.out.println("[Environment]makeAction");
+		
+		Robot r = agents.get(robot);
+		
+		robotPos.set(robot, dst);
+		System.out.println(r + " is now on " + dst);
+		
 		return 0;
 	}
 

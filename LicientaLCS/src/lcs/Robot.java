@@ -15,10 +15,10 @@ public class Robot implements Runnable {
 	 * Class that associates a certain position with the number
 	 * of available routes that go out of it.
 	 */
-	static class PositionNRoutes{
+	static class PositionNRoutes {
 		Position pos;
 		int nR;
-		public PositionNRoutes(Position x, int y){
+		public PositionNRoutes(Position x, int y) {
 			pos = x;
 			nR = y;
 		}
@@ -27,10 +27,10 @@ public class Robot implements Runnable {
 	/**
 	 * Class that associates a certain position with the its reward.
 	 */
-	static class PositionNReward implements Comparable<PositionNReward>{
+	static class PositionNReward implements Comparable<PositionNReward> {
 		Position pos;
 		int reward;
-		public PositionNReward(Position x, int y){
+		public PositionNReward(Position x, int y) {
 			pos = x;
 			reward = y;
 		}
@@ -63,75 +63,46 @@ public class Robot implements Runnable {
 	public static final int BESTAVAILABLE = 2;
 	int type;
 	
-	
-	@Override
-	public void run() {
-		System.out.println(Thread.currentThread()+"is acting like a robot");
-		Position nextMove = null;
-		Vector<Position> adjacent;
-		
-		while (current != target) {
-			
-			adjacent = env.getAdjacent(this);
-			removeDeadEnds(adjacent);
-			if (adjacent.size() == 1){ // we're stuck
-				goBackNMark();
-			} else {
-				nextMove = null;
-				
-				//	I'll wait to move till I get a free position in which I can move
-				nextMove = getNextMove(adjacent);
-				
-				
-				lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
-				if (lastSteps.size() >= noStepsBack)
-					lastSteps.removeFirst();
-				env.makeAction(no, nextMove);
-				
-				current.sem.release();
-				current = nextMove;
-				
-				//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
-				//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ si se va anula efectul benefic
-				current.givePositiveFeedback();				
-			}
-		}
-		
-		System.out.println("Landed on the promised land!");
-	}
-	
 	/**
 	 * Basic constructor
 	 * @param robotNum - robot number
 	 * @param type - type of robot
 	 * @param nSteps - number of steps to backtrack.
 	 */
-	public Robot(int robotNum, int type, int nSteps){
+	public Robot(int robotNum, int type, int nSteps) {
 		no = robotNum;
 		this.type = type;
 		noStepsBack = nSteps;
 		lastSteps = new LinkedList<PositionNRoutes>();
+	}
+	
+	/**
+	 * Retrieves the position on which the robot is on.
+	 * @return the current position.
+	 */
+	public Position getCurrentPosition() {
+		return this.current;
 	}
 
 	/**
 	 * Sets the working environment.
 	 * @param x - The environment to be set.
 	 */
-	public void setEnvironment(Environment x){
+	public void setEnvironment(Environment x) {
 		env = x;
 	}
 	
 	/*
 	 * Sets the destination of the agent
 	 */
-	public void setCurrentGoal( Position stop){
+	public void setCurrentGoal( Position stop) {
 		target = stop;
 	}
 	
 	/*
 	 * Sets the start position of the agent
 	 */
-	public void setStartPosition(Position start){
+	public void setStartPosition(Position start) {
 		current = start;
 	}
 	
@@ -154,12 +125,67 @@ public class Robot implements Runnable {
 		return this.name;
 	}
 	
+	@Override
+	public void run() {
+		System.out.println(getName() + " is acting like a robot");
+		Position nextMove = null;
+		Vector<Position> adjacent;
+		
+		while (current != target) {
+			
+			adjacent = env.getAdjacent(this);
+			removeDeadEnds(adjacent);
+			if (adjacent.size() == 1) { // we're stuck
+				goBackNMark();
+			} else {
+				nextMove = null;
+				
+				//	I'll wait to move till I get a free position in which I can move
+				nextMove = getNextMove(adjacent);
+				
+				/**
+				 * XXX This is error prone.
+				 * Situatie: [A][B][0] un rand numerotat 1-3.
+				 * A care se afla pe pozitia 1 ar vrea sa treaca pe poz 2.
+				 * B vrea pe pozitia 3 care e libera.
+				 * initial A o sa tryAquire pe 2, o sa fail + o sa piarda o tura.
+				 * B o sa treaca pe 3, astfel 2 va fi liber.
+				 * Tot consider ca ar trebui sa se faca o buna parte in env
+				 * astfel robotii sa mearga la aceasi viteza.
+				 * Daca nu vrei sa mearga la aceasi viteza si sa lasam la 
+				 * mana schedelurului thats dandy.
+				 * give opinion.
+				 * As vrea chiar sa fac un package pt robot + rules. This isnt mandatory.
+				 */
+				
+				lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
+				if (lastSteps.size() >= noStepsBack)
+					lastSteps.removeFirst();
+				env.makeAction(no, nextMove);
+				
+				current.sem.release();
+				current = nextMove;
+				
+				//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
+				//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ si se va anula efectul benefic
+				current.givePositiveFeedback();
+				/**
+				 * XXX aici ii dai un pos feedback de reward.
+				 * Mai incolo ii scazi tot atat. In final un drum prost o sa aiba 0
+				 * si nu ceva < 0.
+				 */
+			}
+		}
+		
+		System.out.println("Landed on the promised land!");
+	}
+	
 	/**
 	 * Returns the best Position to take out of the given neighbors.
 	 * @param available - a vector of potential successors.
 	 * @return The best position to go to.
 	 */
-	Position getNextMove(Vector<Position> available){
+	Position getNextMove(Vector<Position> available) {
 		switch (this.type) {
 		case BESTPOSITION:
 			// Robot care vrea neaparat sa se miste pe cea mai buna pozitie
@@ -173,20 +199,22 @@ public class Robot implements Runnable {
 		}
 	}
 	
-	Position getNextMoveAbsolute(Vector<Position> available){
-		System.out.println("eu " + getName() + "cer mutare absolute best ");
+	Position getNextMoveAbsolute(Vector<Position> available) {
+		System.out.println("eu " + getName() + " cer mutare absolute best");
 		Position bestPos = null;
+		// FIXME what?! MIN_VALUE e deja negativ, you sure?
 		int bestReward = -Integer.MIN_VALUE;
 		int tempReward;
 		
-		// If I fail to acquire a position I will recompute the bestPosition until it is available to me
+		// If I fail to acquire a position I will recompute
+		// the bestPosition until it is available to me
 		// logic: the bestPosition might dynamically change - what is good now might
 		//	      not be good 2 steps from now when it will be available
-		while (true){
-			for (Position i: available){
+		while (true) {
+			for (Position i: available) {
 				tempReward = i.getFeedback() -
 					(i.getTopologicPostion() - target.getTopologicPostion());
-				if (tempReward > bestReward){
+				if (tempReward > bestReward) {
 					bestReward = tempReward;
 					bestPos = i;
 				}
@@ -205,8 +233,8 @@ public class Robot implements Runnable {
 		}
 	}
 	
-	Position getNextMoveAvailable(Vector<Position> available){
-		System.out.println("eu " + getName() + "cer mutare best available");
+	Position getNextMoveAvailable(Vector<Position> available) {
+		System.out.println("eu " + getName() + " cer mutare best available");
 		int tempReward;
 		PositionNReward queueElement;
 		Position nextMove;
@@ -216,20 +244,20 @@ public class Robot implements Runnable {
 		//	Maybe all of my available positions are taken
 		//	If that happens, priorities might change until my next iteration through 
 		//		the positions, so I might as well compute them again
-		while (true){
+		while (true) {
 			// Priority queue used to store the order of positions
 			// The order is from greatest to lowest, so the comparator must be implemented like below			 
-	
-			for (Position i: available){
+			
+			for (Position i: available) {
 				tempReward = i.getFeedback() -
 					(i.getTopologicPostion() - target.getTopologicPostion());
 				queueElement = new PositionNReward(i, tempReward);
 				posQueue.add(queueElement);
 			}
 			
-			while (!posQueue.isEmpty()){
+			while (!posQueue.isEmpty()) {
 				nextMove = posQueue.poll().pos;
-				if (nextMove.sem.tryAcquire()){
+				if (nextMove.sem.tryAcquire()) {
 					return nextMove;
 				}
 			}
@@ -237,15 +265,7 @@ public class Robot implements Runnable {
 		
 	}
 	
-	/**
-	 * Retrieves the position on which the robot is on.
-	 * @return the current position.
-	 */
-	public Position getCurrentPosition() {
-		return this.current;
-	}
-	
-	void removeDeadEnds(Vector<Position> adjacent){
+	void removeDeadEnds(Vector<Position> adjacent) {
 		Vector<Position> toRemove = new Vector<Position>();
 		for(Position x:adjacent)
 			if (x.isDeadEnd())
@@ -254,7 +274,7 @@ public class Robot implements Runnable {
 			adjacent.remove(x);
 	}
 	
-	void goBackNMark(){
+	void goBackNMark() {
 		// should I block the current node ?
 		boolean toBlock = true;
 		// used to stock next position on the road back and the number of routes for that position
@@ -264,7 +284,7 @@ public class Robot implements Runnable {
 		// the no. of available routes at me current position
 		int noARoutes;		
 		
-		while (!lastSteps.isEmpty()){
+		while (!lastSteps.isEmpty()) {
 			
 			aux = lastSteps.removeLast();
 			nextMove = aux.pos;
@@ -272,7 +292,7 @@ public class Robot implements Runnable {
 			/*
 			 *  Part where I check out how to block certain routes
 			 */
-			if (toBlock){
+			if (toBlock) {
 				nextMove.blockRoute(current);
 				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
 				current.blockRoute(nextMove);
@@ -291,11 +311,13 @@ public class Robot implements Runnable {
 			 * Actual movement backwards
 			 */
 			
+			/**
+			 * XXX just realised this ... all of a sudden noi nu tinem cont ca
+			 * graful e orientat. Daca vrei sa te intorci si nu poti?
+			 */
 			env.makeAction(no, nextMove);
 			current = nextMove;
 		}
-		
-		
 	}
 	
 }
