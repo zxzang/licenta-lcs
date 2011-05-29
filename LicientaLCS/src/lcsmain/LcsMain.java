@@ -2,6 +2,7 @@ package lcsmain;
 
 import lcs.Environment;
 import lcsgui.GraphFrame;
+import org.apache.log4j.*;
 
 public class LcsMain {
 	
@@ -16,10 +17,17 @@ public class LcsMain {
 	static GraphFrame gFrame;
 	
 	/**
+	 * Logger used to log debug data and errors.
+	 */
+	public static Logger logger = Logger.getLogger("LcsMain");
+	
+	/**
 	 * The main for the whole application.
 	 * @param args - the input file.
 	 */
 	public static void main(final String[] args) {
+		
+		PropertyConfigurator.configure("logger.properties");
 		
 		if (args.length != 1) {
 			System.err.println("Please provide an input xml.");

@@ -4,12 +4,17 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
+import lcsmain.LcsMain;
+
+import org.apache.log4j.*;
+
+
 /**
  * 
  * @author Dascalu Sorin
  *
  */
-public class Robot implements Runnable {
+public class Robot extends Thread {
 
 	/**
 	 * Class that associates a certain position with the number
@@ -51,8 +56,8 @@ public class Robot implements Runnable {
 	Environment env;
 	LinkedList<PositionNRoutes> lastSteps;
 	int noStepsBack;
-	int no;
-	private String name;
+	int no;	
+	private Logger logger = LcsMain.logger;
 	
 	/**
 	 * 	Robot type
@@ -107,23 +112,13 @@ public class Robot implements Runnable {
 	}
 	
 	/**
-	 * Gives the robot a name.
-	 * @param name - the string to be associated.
+	 * --- Am scos setName si getName pentru ca am modificat clasa robot.
+	 * Nu mai implementeaza runnable ci extinde thread. Era grasit cum facusem initial
+	 * Daca implementa runnable nu pornea un thread separat cand dadeam run ci pur si 
+	 * simplu rula in threadul curent.
+	 * Alea doua metode sunt final in Thread deci nu pot fi suprascrise. 
 	 */
-	public void setName(String name) {
-		this.name = name;
-	}
 	
-	/**
-	 * Returns the name of the robot.
-	 * If the name isn't set it will return the currentThread.
-	 * @return a string representation of the robot.
-	 */
-	public String getName() {
-		if (this.name == null)
-			return Thread.currentThread().toString();
-		return this.name;
-	}
 	
 	@Override
 	public void run() {
@@ -177,7 +172,7 @@ public class Robot implements Runnable {
 			}
 		}
 		
-		System.out.println("Landed on the promised land!");
+		logger.info("Landed on the promised land!");
 	}
 	
 	/**
@@ -194,13 +189,13 @@ public class Robot implements Runnable {
 			// Robotul decide sa urmeze cea mai buna cale libera
 			return getNextMoveAvailable(available);
 		default:
-			System.err.println("[Robot.getNextMove] Unknown option " + type);
+			logger.error("[Robot.getNextMove] Unknown option " + type);
 			return null;
 		}
 	}
 	
 	Position getNextMoveAbsolute(Vector<Position> available) {
-		System.out.println("eu " + getName() + " cer mutare absolute best");
+		logger.debug("eu " + getName() + " cer mutare absolute best");
 		Position bestPos = null;
 		// FIXME what?! MIN_VALUE e deja negativ, you sure?
 		int bestReward = -Integer.MIN_VALUE;
@@ -314,6 +309,8 @@ public class Robot implements Runnable {
 			/**
 			 * XXX just realised this ... all of a sudden noi nu tinem cont ca
 			 * graful e orientat. Daca vrei sa te intorci si nu poti?
+			 * --- issue fixed: grafu o sa fie orientat doar atunci cand se 
+			 * face sortarea topologica - pe cazul real graful e neorientat 
 			 */
 			env.makeAction(no, nextMove);
 			current = nextMove;
