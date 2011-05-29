@@ -97,14 +97,14 @@ public class Robot extends Thread {
 		env = x;
 	}
 	
-	/*
+	/**
 	 * Sets the destination of the agent
 	 */
 	public void setCurrentGoal( Position stop) {
 		target = stop;
 	}
 	
-	/*
+	/**
 	 * Sets the start position of the agent
 	 */
 	public void setStartPosition(Position start) {
@@ -113,10 +113,11 @@ public class Robot extends Thread {
 	
 	/**
 	 * --- Am scos setName si getName pentru ca am modificat clasa robot.
-	 * Nu mai implementeaza runnable ci extinde thread. Era grasit cum facusem initial
+	 * Nu mai implementeaza runnable ci extinde thread. Era gresit cum facusem initial
 	 * Daca implementa runnable nu pornea un thread separat cand dadeam run ci pur si 
 	 * simplu rula in threadul curent.
-	 * Alea doua metode sunt final in Thread deci nu pot fi suprascrise. 
+	 * Alea doua metode sunt final in Thread deci nu pot fi suprascrise => delete
+	 * Hope i didn't fuck anything up. 
 	 */
 	
 	
@@ -168,7 +169,25 @@ public class Robot extends Thread {
 				 * XXX aici ii dai un pos feedback de reward.
 				 * Mai incolo ii scazi tot atat. In final un drum prost o sa aiba 0
 				 * si nu ceva < 0.
+				 * 
+				 * --- eu am gandit ca nu e relevanta neaparat o recompensa negativa
+				 * Un robot va alege intre doua pozitii x si y pe cea ce recompensa mai mare,
+				 * nu pe cea cu recompensa pozitiva. Asa ca pentru el e acceasi chestie
+				 * daca vede o recompensa pozitiva mica sau una negativa. Blocarea rutelor 
+				 * nu sta in semnul recompensei ci in structura aia de rute blocate.
+				 * Ideea de a ii da o recompensa si apoi de a o lua inapoi e sa 
+				 * presupun ca robotu merge bun and pat him on the head dar daca se dovedeste
+				 * ca e gresit sa ii iau recompensa inapoi pt nu a induce in eroare alti roboti.
+				 * Am presupus ca un drum e drum bun until proven otherwise.
+				 * Am putea sa nu alocam deloc recompensa si sa dam o recompensa pozitiva
+				 * ultimilor 10 pasi atunci cand robotul chiar ajunge in pozitia finala
+				 * (un fel de GoBackNMark doar ca varianta pozitiva). Dar nu mi se pare o
+				 * varianta buna - ar trebui sa presupunem ca cel mai lung drum are un anumit
+				 * numar de pasi - gotta think about it ( o varianta ar fi sa tinem minte tot
+				 * drumu parcurs si sa il marcam pozitiv - cam complicat tho).
+				 *  Zi-mi daca ti se pare o solutie mai buna.
 				 */
+				
 			}
 		}
 		
@@ -215,13 +234,20 @@ public class Robot extends Thread {
 				}
 			}
 			
-			/* not sure I'm licking this
+			/* XXX not sure I'm licking this
 			 * poate ar trebui sa intoarca o pozitie si sa faca acquire
 			 * in functia principala?
 			 * toti roboti o sa comunice cu env. asa vad eu
 			 * nu o sa fie unul mai rapid ca altul
 			 * o sa fie sincronizati printr-o bariera.
 			 * discuss.
+			 * --- Nu cred ca e o idee buna.. daca facem asa e posibil
+			 * sa apara totusi race condition. Ex: A si B gasesc ambii pozitia
+			 * X ca fiind cea mai buna in urma apelului getNextMove. Doar unul singur
+			 * va putea sa prinda pozitia respectiva. Cel mai bine e sa iei pozitia aia
+			 * de cum ai gasit-o libera. Daca ai tu alta idee de cum sa mutam tryaquire de aici
+			 * in programul principal fara sa ramana o bucata mica de timp in care sa poata
+			 * aparea race conditions facem modificarea.
 			 */
 			if (bestPos.sem.tryAcquire())
 				return bestPos;
