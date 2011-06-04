@@ -9,6 +9,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import lcsmain.LcsMain;
+
+import org.apache.log4j.Logger;
+
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.io.GraphIOException;
 import edu.uci.ics.jung.io.graphml.GraphMLReader2;
@@ -47,6 +51,11 @@ public class Environment {
 	 */
 	protected int stepsBack = 10;
 	
+	/**
+	 * Logger from mains
+	 */
+	private Logger logger = LcsMain.logger;
+	
 	// TODO consider adding a barrier for sync + a sync function
 
 	/**
@@ -60,22 +69,27 @@ public class Environment {
 			this.getGraph(input);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			System.err.println("The file " + input + " was not found.");
+			logger.error("The file " + input + " was not found.");
 			System.exit(-1);
 		} catch (GraphIOException e) {
 			e.printStackTrace();
-			System.err.println("There was a problem reading"
+			logger.error("There was a problem reading"
 					+ " the graph from " + input + ".");
 			System.exit(-1);
 		}
 		
 		this.getTarget();
 		this.sortTop(); // XXX happy debuging
-		this.addAgents();
 		
-		this.setRobotPositions();
+		// --- L-am mutat in main . Pare mai logic. Instantiez enviromentu. Pun agenti in el.
+		//	Pun agentii in miscare. Mi se pare mai ok sa fie vizibili pasii mari in main.
+		//this.addAgents();
 		
-		this.startAgents();
+		// ---	Same - mutat in addAgents din clasa curenta
+		//this.setRobotPositions();
+		
+		// --- Mutat in lcsMain
+		//this.startAgents();
 	}
 	
 	/**
@@ -91,9 +105,11 @@ public class Environment {
 	}
 	
 	/**
-	 * 
+	 * Adds agents on the map
+	 * @param percentBestPos - the percentage of robots that will act
+	 * 		on the bestPosition behavior
 	 */
-	private void addAgents() {
+	public void addAgents(double percentBestPos) {
 		int n = 0;
 		Collection<Position> verts = network.getVertices();
 		this.agents = new Vector<Robot>();
@@ -107,7 +123,12 @@ public class Environment {
 			/* for each stored robot name */
 			for (String name : p.robotNames) {
 				// TODO ponder .. cum selectez diferite tipuri?
-				Robot r = new Robot(n, Robot.BESTAVAILABLE, stepsBack);
+				// --- solved
+				Robot r;
+				if (n >= percentBestPos * p.robotNames.size())
+					r = new Robot(n, Robot.BESTAVAILABLE, stepsBack);
+				else 
+					r = new Robot(n, Robot.BESTPOSITION, stepsBack);
 				r.setName(name);
 				r.setCurrentGoal(this.targetPosition);
 				r.setStartPosition(p);
@@ -118,6 +139,8 @@ public class Environment {
 			
 			p.robotNames = null;
 		}
+		
+		this.setRobotPositions();
 		
 	}
 	
@@ -135,6 +158,7 @@ public class Environment {
 	 * Set the vector that contains positions for the agents.
 	 * @param pos - the position vector.
 	 */
+	// --- ne mai trebuie asta ? 
 	public final void setRobotPositions(final Vector<Position> pos) {
 		this.robotPos = pos;
 	}
@@ -290,14 +314,14 @@ public class Environment {
 	 * @param dst - the destination desired by the agent.
 	 * @return 0 / 1
 	 */
-	public final int makeAction(final int robot, final Position dst) {
-		System.out.println("[Environment]makeAction");
+	public final int makeAction(final int robotId, final Position dst) {
+		logger.debug("[Enviroment] MakeAction");
 		
-		Robot r = agents.get(robot);
+		// --- Useless line ?
+		// Robot r = agents.get(robotId);		
+		robotPos.set(robotId, dst);
 		
-		robotPos.set(robot, dst);
-		System.out.println(r + " is now on " + dst);
-		
+		logger.debug(robotId + " got to "+dst.getTopologicPostion());
 		return 0;
 	}
 
