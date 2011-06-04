@@ -56,8 +56,9 @@ public class Robot extends Thread {
 	Environment env;
 	LinkedList<PositionNRoutes> lastSteps;
 	int noStepsBack;
-	int no;	
+	int robotId;	
 	private Logger logger = LcsMain.logger;
+	static int noRobots = 0;
 	
 	/**
 	 * 	Robot type
@@ -75,10 +76,11 @@ public class Robot extends Thread {
 	 * @param nSteps - number of steps to backtrack.
 	 */
 	public Robot(int robotNum, int type, int nSteps) {
-		no = robotNum;
+		robotId = robotNum;
 		this.type = type;
 		noStepsBack = nSteps;
 		lastSteps = new LinkedList<PositionNRoutes>();
+		Robot.noRobots++;
 	}
 	
 	/**
@@ -123,7 +125,7 @@ public class Robot extends Thread {
 	
 	@Override
 	public void run() {
-		System.out.println(getName() + " is acting like a robot");
+		logger.debug(getName() + " is acting like a robot");
 		Position nextMove = null;
 		Vector<Position> adjacent;
 		
@@ -157,7 +159,7 @@ public class Robot extends Thread {
 				lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 				if (lastSteps.size() >= noStepsBack)
 					lastSteps.removeFirst();
-				env.makeAction(no, nextMove);
+				env.makeAction(robotId, nextMove);
 				
 				current.sem.release();
 				current = nextMove;
@@ -338,7 +340,7 @@ public class Robot extends Thread {
 			 * --- issue fixed: grafu o sa fie orientat doar atunci cand se 
 			 * face sortarea topologica - pe cazul real graful e neorientat 
 			 */
-			env.makeAction(no, nextMove);
+			env.makeAction(robotId, nextMove);
 			current = nextMove;
 		}
 	}

@@ -36,6 +36,8 @@ public class LcsMain {
 		
 		env = new Environment(args[0]);
 		gFrame = new GraphFrame(env);
+		env.addAgents(0.5);
+		env.startAgents();
 		// TODO robot position
 	}
 
