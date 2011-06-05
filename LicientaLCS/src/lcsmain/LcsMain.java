@@ -44,9 +44,13 @@ public class LcsMain {
 		gFrame = new GraphFrame(env);
 		env.addAgents(0.5);
 		env.startAgents();
-		// TODO robot position
-		// TODO poate ar fi bine sa separam robotii de topologie 
-		//		xmlul sa contina doar cum arata graful si atat
+		/* TODO poate ar fi bine sa separam robotii de topologie 
+				xmlul sa contina doar cum arata graful si atat
+			XXX yeah ... asta a fost o chestie de dragul de a avea ceva ce merge
+			nu vreau sa fie asta final
+			poate adaugam prin gui si acolo tot dam start.
+			ne mai gandim dupa facem ceva cu graful.
+		*/
 	}
 
 }

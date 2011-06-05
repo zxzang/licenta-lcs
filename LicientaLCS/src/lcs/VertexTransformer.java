@@ -1,7 +1,6 @@
 package lcs;
 
 import java.util.Map;
-import lcsmain.LcsMain;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;

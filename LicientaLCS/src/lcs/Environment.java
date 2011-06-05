@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import lcsmain.LcsMain;
-
 import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.graph.Graph;
@@ -79,19 +77,12 @@ public class Environment {
 		}
 		
 		this.getTarget();
-		logger.info("Target position is " + targetPosition + 
-				" with  top position " + targetPosition.getTopologicPostion());
+		
 		this.sortTop(); // XXX happy debuging
 		
-		// --- L-am mutat in main . Pare mai logic. Instantiez enviromentu. Pun agenti in el.
-		//	Pun agentii in miscare. Mi se pare mai ok sa fie vizibili pasii mari in main.
-		//this.addAgents();
-		
-		// ---	Same - mutat in addAgents din clasa curenta
-		//this.setRobotPositions();
-		
-		// --- Mutat in lcsMain
-		//this.startAgents();
+		// XXX teai gandit mult
+		logger.info("Target position is " + targetPosition + 
+				" with  top position " + targetPosition.getTopologicPostion());
 	}
 	
 	/**
@@ -124,8 +115,6 @@ public class Environment {
 			
 			/* for each stored robot name */
 			for (String name : p.robotNames) {
-				// TODO ponder .. cum selectez diferite tipuri?
-				// --- solved
 				Robot r;
 				if (n >= percentBestPos * p.robotNames.size())
 					r = new Robot(n, Robot.BESTAVAILABLE, stepsBack);
@@ -160,7 +149,8 @@ public class Environment {
 	 * Set the vector that contains positions for the agents.
 	 * @param pos - the position vector.
 	 */
-	// --- ne mai trebuie asta ? 
+	// --- ne mai trebuie asta ?
+	// was on the may-delete list
 	public final void setRobotPositions(final Vector<Position> pos) {
 		this.robotPos = pos;
 	}
@@ -321,7 +311,6 @@ public class Environment {
 	public final int makeAction(final int robotId, final Position dst) {
 		logger.debug("[Enviroment] MakeAction");
 		
-		// --- Useless line ?
 		Robot r = agents.get(robotId);		
 		robotPos.set(robotId, dst);
 		
