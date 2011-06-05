@@ -39,6 +39,8 @@ public class LcsMain {
 		env.addAgents(0.5);
 		env.startAgents();
 		// TODO robot position
+		// TODO poate ar fi bine sa separam robotii de topologie 
+		//		xmlul sa contina doar cum arata graful si atat
 	}
 
 }
