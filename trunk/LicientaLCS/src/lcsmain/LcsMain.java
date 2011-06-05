@@ -19,7 +19,13 @@ public class LcsMain {
 	/**
 	 * Logger used to log debug data and errors.
 	 */
-	public static Logger logger = Logger.getLogger("LcsMain");
+	public static Logger logger;
+	
+	private static void setLoggers(){
+		logger = Logger.getLogger("LcsMain");
+		PropertyConfigurator.configure("logger.properties");
+		
+	}
 	
 	/**
 	 * The main for the whole application.
@@ -27,7 +33,7 @@ public class LcsMain {
 	 */
 	public static void main(final String[] args) {
 		
-		PropertyConfigurator.configure("logger.properties");
+		setLoggers();		
 		
 		if (args.length != 1) {
 			System.err.println("Please provide an input xml.");

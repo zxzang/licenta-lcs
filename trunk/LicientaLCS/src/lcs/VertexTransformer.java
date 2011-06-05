@@ -1,11 +1,10 @@
 package lcs;
 
 import java.util.Map;
-import java.util.logging.Logger;
-
 import lcsmain.LcsMain;
 
 import org.apache.commons.collections15.Transformer;
+import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.io.graphml.NodeMetadata;
 
@@ -25,8 +24,8 @@ public class VertexTransformer implements Transformer<NodeMetadata, Position> {
 	 */
 	private static final String ROBOTKEY = "robot";
 	
-	private org.apache.log4j.Logger logger = LcsMain.logger;
-
+	private static Logger logger = Logger.getLogger("VertexTransformer");
+	
 	@Override
 	public final Position transform(final NodeMetadata metadata) {
 		String nodeType = metadata.getProperty(NODETYPE);
@@ -48,8 +47,7 @@ public class VertexTransformer implements Transformer<NodeMetadata, Position> {
 		{
 			String key = entry.getKey();
 			if (key.startsWith(ROBOTKEY)) {
-				ret.addRobot(entry.getValue());
-				
+				ret.addRobot(entry.getValue());				
 			}
 		}
 
