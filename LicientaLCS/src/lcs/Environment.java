@@ -54,7 +54,7 @@ public class Environment {
 	/**
 	 * Logger from mains
 	 */
-	private static Logger logger = LcsMain.logger;
+	private static Logger logger = Logger.getLogger("Environment");
 	
 	// TODO consider adding a barrier for sync + a sync function
 

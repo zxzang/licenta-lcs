@@ -57,7 +57,7 @@ public class Robot extends Thread {
 	LinkedList<PositionNRoutes> lastSteps;
 	int noStepsBack;
 	int robotId;	
-	private Logger logger = LcsMain.logger;
+	private static Logger logger = Logger.getLogger("Robot");
 	static int noRobots = 0;
 	
 	/**
