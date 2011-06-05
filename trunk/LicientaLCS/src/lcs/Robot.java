@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
-import lcsmain.LcsMain;
-
 import org.apache.log4j.*;
 
 
@@ -113,16 +111,6 @@ public class Robot extends Thread {
 		current = start;
 	}
 	
-	/**
-	 * --- Am scos setName si getName pentru ca am modificat clasa robot.
-	 * Nu mai implementeaza runnable ci extinde thread. Era gresit cum facusem initial
-	 * Daca implementa runnable nu pornea un thread separat cand dadeam run ci pur si 
-	 * simplu rula in threadul curent.
-	 * Alea doua metode sunt final in Thread deci nu pot fi suprascrise => delete
-	 * Hope i didn't fuck anything up. 
-	 */
-	
-	
 	@Override
 	public void run() {
 		logger.debug(getName() + " is acting like a robot");
@@ -188,6 +176,7 @@ public class Robot extends Thread {
 				 * numar de pasi - gotta think about it ( o varianta ar fi sa tinem minte tot
 				 * drumu parcurs si sa il marcam pozitiv - cam complicat tho).
 				 *  Zi-mi daca ti se pare o solutie mai buna.
+				 *  XXX un position prost va avea 0 la fel ca unul nedescoperit inca.
 				 */
 				
 			}
@@ -218,7 +207,7 @@ public class Robot extends Thread {
 	Position getNextMoveAbsolute(Vector<Position> available) {
 		logger.debug("eu " + getName() + " cer mutare absolute best");
 		Position bestPos = null;
-		// FIXME what?! MIN_VALUE e deja negativ, you sure?
+		// XXX what?! MIN_VALUE e deja negativ, you sure?
 		int bestReward = -Integer.MIN_VALUE;
 		int tempReward;
 		
@@ -250,6 +239,10 @@ public class Robot extends Thread {
 			 * de cum ai gasit-o libera. Daca ai tu alta idee de cum sa mutam tryaquire de aici
 			 * in programul principal fara sa ramana o bucata mica de timp in care sa poata
 			 * aparea race conditions facem modificarea.
+			 * XXX adevarul e ca eu vedeam o abordare mai TB(S)
+			 * ma gandeam ceva de genul: fiecare transmite un mesaj la env
+			 * si astepata raspunsul, o coada de mesaje
+			 * nu cred ca nici asta ar fi fool-proof.
 			 */
 			if (bestPos.sem.tryAcquire())
 				return bestPos;
@@ -325,20 +318,14 @@ public class Robot extends Thread {
 			
 			noARoutes = aux.nR;
 			
-			if (noARoutes <= 1 && toBlock) // there is one way .. the way back. Block the position I say
+			// there is one way .. the way back. Block the position I say
+			if (noARoutes <= 1 && toBlock)
 				toBlock = true;			
 			else // blocked a route but others are available .. position stands
 				toBlock = false;
 			
 			/*
 			 * Actual movement backwards
-			 */
-			
-			/**
-			 * XXX just realised this ... all of a sudden noi nu tinem cont ca
-			 * graful e orientat. Daca vrei sa te intorci si nu poti?
-			 * --- issue fixed: grafu o sa fie orientat doar atunci cand se 
-			 * face sortarea topologica - pe cazul real graful e neorientat 
 			 */
 			env.makeAction(robotId, nextMove);
 			current = nextMove;
