@@ -54,7 +54,7 @@ public class Environment {
 	/**
 	 * Logger from mains
 	 */
-	private Logger logger = LcsMain.logger;
+	private static Logger logger = LcsMain.logger;
 	
 	// TODO consider adding a barrier for sync + a sync function
 
@@ -79,6 +79,8 @@ public class Environment {
 		}
 		
 		this.getTarget();
+		logger.info("Target position is " + targetPosition + 
+				" with  top position " + targetPosition.getTopologicPostion());
 		this.sortTop(); // XXX happy debuging
 		
 		// --- L-am mutat in main . Pare mai logic. Instantiez enviromentu. Pun agenti in el.
@@ -133,10 +135,10 @@ public class Environment {
 				r.setCurrentGoal(this.targetPosition);
 				r.setStartPosition(p);
 				r.setEnvironment(this);
-				this.agents.add(r);
+				this.agents.add(r);				
 				n++;
+				logger.info("Added agent " + r.getName());
 			}
-			
 			p.robotNames = null;
 		}
 		
@@ -266,7 +268,9 @@ public class Environment {
 	 */
 	public final void startAgents() {
 		for (Robot r : agents) {
-			r.run();
+			logger.debug("Starting " + r.getName());
+			if (r.getName().compareTo("bender") != 0)
+				r.start();
 		}
 	}
 	
@@ -318,10 +322,10 @@ public class Environment {
 		logger.debug("[Enviroment] MakeAction");
 		
 		// --- Useless line ?
-		// Robot r = agents.get(robotId);		
+		Robot r = agents.get(robotId);		
 		robotPos.set(robotId, dst);
 		
-		logger.debug(robotId + " got to "+dst.getTopologicPostion());
+		logger.debug(r.getName() + " got to "+dst.getTopologicPostion());
 		return 0;
 	}
 
