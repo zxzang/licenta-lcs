@@ -113,7 +113,9 @@ public class Robot extends Thread {
 	
 	@Override
 	public void run() {
-		logger.debug(getName() + " is acting like a robot");
+		logger.debug(getName() + " is acting like a robot \n"+
+				"\tand started from " + current + "[" + 
+				current.getTopologicPostion() + "]");
 		Position nextMove = null;
 		Vector<Position> adjacent;
 		
@@ -183,6 +185,7 @@ public class Robot extends Thread {
 		}
 		
 		logger.info("Landed on the promised land!");
+		env.removeFromMap(robotId);
 	}
 	
 	/**
@@ -205,7 +208,7 @@ public class Robot extends Thread {
 	}
 	
 	Position getNextMoveAbsolute(Vector<Position> available) {
-		logger.debug("eu " + getName() + " cer mutare absolute best");
+		//logger.debug("eu " + getName() + " cer mutare absolute best");
 		Position bestPos = null;
 		// XXX what?! MIN_VALUE e deja negativ, you sure?
 		int bestReward = -Integer.MIN_VALUE;
@@ -244,13 +247,13 @@ public class Robot extends Thread {
 			 * si astepata raspunsul, o coada de mesaje
 			 * nu cred ca nici asta ar fi fool-proof.
 			 */
-			if (bestPos.sem.tryAcquire())
+			if (bestPos != null && bestPos.sem.tryAcquire())
 				return bestPos;
 		}
 	}
 	
 	Position getNextMoveAvailable(Vector<Position> available) {
-		System.out.println("eu " + getName() + " cer mutare best available");
+		//System.out.println("eu " + getName() + " cer mutare best available");
 		int tempReward;
 		PositionNReward queueElement;
 		Position nextMove;

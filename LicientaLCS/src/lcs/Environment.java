@@ -259,8 +259,7 @@ public class Environment {
 	public final void startAgents() {
 		for (Robot r : agents) {
 			logger.debug("Starting " + r.getName());
-			if (r.getName().compareTo("bender") != 0)
-				r.start();
+			r.start();
 		}
 	}
 	
@@ -309,13 +308,21 @@ public class Environment {
 	 * @return 0 / 1
 	 */
 	public final int makeAction(final int robotId, final Position dst) {
-		logger.debug("[Enviroment] MakeAction");
+		//logger.debug("MakeAction");
 		
 		Robot r = agents.get(robotId);		
 		robotPos.set(robotId, dst);
 		
-		logger.debug(r.getName() + " got to "+dst.getTopologicPostion());
+		logger.debug(r.getName() + " got to " + dst + 
+				"[" + dst.getTopologicPostion() + "]");
 		return 0;
+	}
+	
+	public final void removeFromMap(int robotId){
+		targetPosition.sem.release();
+		Robot r = agents.get(robotId);
+		logger.debug(r.getName() + " ejected from map");
+		//robotPos.set(robotId, -1);
 	}
 
 }
