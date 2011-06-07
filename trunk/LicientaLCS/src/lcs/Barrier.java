@@ -8,11 +8,12 @@ public class Barrier {
 		
 	}
 	public Barrier(int nThreads){
-		noThreadsMax = nThreads;
+		noThreadsMax = nThreads;		
 	}
 	
 	public void setNumThreads(int nThreads){
 		noThreadsMax = nThreads;
+		System.out.println("Barrier has " + nThreads);
 	}
 	
 	public synchronized void enterBarrier() throws InterruptedException{

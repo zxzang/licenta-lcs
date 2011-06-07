@@ -123,15 +123,30 @@ public class Robot extends Thread {
 				current.getTopologicPostion() + "]");
 		Position nextMove = null;
 		Vector<Position> adjacent;
+		String adjacentStr;
 		
 		while (current != target) {
-			
+			logger.debug("My turn - i am on " + current);			
 			adjacent = env.getAdjacent(this);
+
+			adjacentStr = "";
+			for(Position x:adjacent)
+				adjacentStr += x + " ";
+			logger.debug("All adjacents: "+adjacentStr);
+
 			removeDeadEnds(adjacent);
+			
+			adjacentStr = "";
+			for(Position x:adjacent)
+				adjacentStr += x + " ";
+			logger.debug("Valid adjacents: "+adjacentStr);
+
 			if (adjacent.size() == 1) { // we're stuck
+				logger.debug(getName() + " is on his way backwards");
 				goBackNMark();
 			} else {
 				nextMove = null;
+				
 				
 				//	I'll wait to move till I get a free position in which I can move
 				nextMove = getNextMove(adjacent);
@@ -152,7 +167,7 @@ public class Robot extends Thread {
 				 */
 				
 				if (nextMove == null){
-					logger.debug(this.getName() + "held his ground");
+					logger.debug(this.getName() + " held his ground");
 					try{
 						bar.enterBarrier();
 					} catch (InterruptedException ex) {
@@ -170,6 +185,13 @@ public class Robot extends Thread {
 					//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
 					//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ si se va anula efectul benefic
 					current.givePositiveFeedback();
+					
+					try{
+						bar.enterBarrier();
+					} catch (InterruptedException ex) {
+						logger.error(this.getName() + "could not enter the barrier");
+					}
+
 				}
 				/**
 				 * XXX aici ii dai un pos feedback de reward.
@@ -297,6 +319,7 @@ public class Robot extends Thread {
 		int noARoutes;		
 		
 		while (!lastSteps.isEmpty()) {
+			logger.debug(getName() + " is moving backward");
 			
 			aux = lastSteps.removeLast();
 			nextMove = aux.pos;
@@ -323,8 +346,24 @@ public class Robot extends Thread {
 			/*
 			 * Actual movement backwards
 			 */
+			while (!nextMove.sem.tryAcquire()){
+				try{
+					logger.debug(getName() + " held his ground" +
+							"\n\twaiting for a previous " + nextMove +
+							" to be free");
+					bar.enterBarrier();
+				} catch (InterruptedException ex){
+					logger.error(getName() + "could not enter barrier");
+				}
+			}
+
 			env.makeAction(robotId, nextMove);
 			current = nextMove;
+			try{
+				bar.enterBarrier();
+			} catch (InterruptedException ex){
+				logger.error(getName() + "could not enter barrier");
+			}
 		}
 	}
 	
