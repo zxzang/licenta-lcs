@@ -14,7 +14,7 @@
 	<key id="robot2" for="node" attr.name="robot" attr.type="string"/>
 	<key id="robot3" for="node" attr.name="robot" attr.type="string"/>
 	
-	<graph id="G" edgedefault="directed">
+	<graph id="G" edgedefault="undirected">
 		<data key="noStepsBack">10</data>
 	
 		<!-- nodes -->

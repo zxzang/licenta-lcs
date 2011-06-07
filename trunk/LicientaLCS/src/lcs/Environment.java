@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import lcsmain.LcsMain;
+
 import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.graph.Graph;
@@ -89,6 +91,22 @@ public class Environment {
 		// XXX teai gandit mult
 		logger.info("Target position is " + targetPosition + 
 				" with  top position " + targetPosition.getTopologicPostion());
+		
+		/* debug purpose */
+		
+		if (LcsMain.DEBUG){
+			ArrayList<Position> c = new ArrayList<Position>(
+					network.getVertices());
+			for (Iterator<Position> p = c.iterator(); p.hasNext();) {
+				Position pos = p.next();
+				logger.debug(pos + "with top " + pos.getTopologicPostion());
+			}
+	
+			try{
+				Thread.sleep(10000);
+			} catch (InterruptedException ex){}
+		}
+		
 	}
 	
 	/**
@@ -195,6 +213,9 @@ public class Environment {
 	 * Used to topologically sort the graph.
 	 */
 	private void sortTop() {
+		
+		// --- Replaced this BFS - might suit our needs better
+		
 		// TODO remove stupid comments after testing code
 		// L - Empty list that will contain the sorted nodes
 		LinkedList<Position> l = new LinkedList<Position>();
@@ -203,15 +224,15 @@ public class Environment {
 		ArrayList<Position> c = new ArrayList<Position>(
 				network.getVertices());
 		
+		Position pos = null;
 		for (Iterator<Position> p = c.iterator(); p.hasNext();) {
-			Position pos = p.next();
-			if (network.inDegree(pos) > 0) {
-				p.remove();
-			}
+			pos = p.next();			
+			p.remove();
 		}
+		c.add(pos);
 		
 		for (Iterator<Position> p = c.iterator(); p.hasNext();) {
-			Position pos = p.next();
+			pos = p.next();
 			this.visit(pos, l);
 		}
 		
@@ -222,6 +243,8 @@ public class Environment {
 			//System.out.println(p + " " + i);
 			p.setTopologicPostion(i);
 		}
+
+		
 	}
 	
 	/**

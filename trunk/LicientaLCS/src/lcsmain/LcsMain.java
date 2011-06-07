@@ -11,6 +11,8 @@ public class LcsMain {
 	 */
 	static Environment env;
 	
+	public final static boolean DEBUG = false;
+	
 	/**
 	 * The {@link GraphFrame} used for visualizing the {@link Environment}.
 	 */

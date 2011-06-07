@@ -132,14 +132,14 @@ public class Robot extends Thread {
 			adjacentStr = "";
 			for(Position x:adjacent)
 				adjacentStr += x + " ";
-			logger.debug("All adjacents: "+adjacentStr);
+			//logger.debug("All adjacents: "+adjacentStr);
 
 			removeDeadEnds(adjacent);
 			
 			adjacentStr = "";
 			for(Position x:adjacent)
 				adjacentStr += x + " ";
-			logger.debug("Valid adjacents: "+adjacentStr);
+			//logger.debug("Valid adjacents: "+adjacentStr);
 
 			if (adjacent.size() == 1) { // we're stuck
 				logger.debug(getName() + " is on his way backwards");
@@ -292,6 +292,7 @@ public class Robot extends Thread {
 		while (!posQueue.isEmpty()) {
 			nextMove = posQueue.poll().pos;
 			if (nextMove.sem.tryAcquire()) {
+				logger.debug("acquired "+nextMove);
 				return nextMove;
 			}
 		}
@@ -348,7 +349,7 @@ public class Robot extends Thread {
 			 */
 			while (!nextMove.sem.tryAcquire()){
 				try{
-					logger.debug(getName() + " held his ground" +
+					logger.debug(getName() + " held his ground " + current +
 							"\n\twaiting for a previous " + nextMove +
 							" to be free");
 					bar.enterBarrier();
