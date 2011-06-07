@@ -54,6 +54,11 @@ public class Environment {
 	 */
 	private static Logger logger = Logger.getLogger("Environment");
 	
+	/**
+	 * Barrier used to sync robot moves
+	 */
+	static Barrier robotBar;
+	
 	// TODO consider adding a barrier for sync + a sync function
 
 	/**
@@ -62,6 +67,7 @@ public class Environment {
 	 */
 	public Environment(final String input) {
 		this.agents = new Vector<Robot>();
+		this.robotBar = new Barrier();
 		
 		try {
 			this.getGraph(input);
@@ -130,7 +136,7 @@ public class Environment {
 			}
 			p.robotNames = null;
 		}
-		
+		this.robotBar.setNumThreads(n);
 		this.setRobotPositions();
 		
 	}
