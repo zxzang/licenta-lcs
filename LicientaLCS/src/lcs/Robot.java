@@ -56,6 +56,11 @@ public class Robot extends Thread {
 	int noStepsBack;
 	int robotId;	
 	private static Logger logger = Logger.getLogger("Robot");
+	private static Barrier bar = Environment.robotBar;
+	
+	/**
+	 * Number of robots instantiated of this class
+	 */
 	static int noRobots = 0;
 	
 	/**
@@ -146,17 +151,26 @@ public class Robot extends Thread {
 				 * As vrea chiar sa fac un package pt robot + rules. This isnt mandatory.
 				 */
 				
-				lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
-				if (lastSteps.size() >= noStepsBack)
-					lastSteps.removeFirst();
-				env.makeAction(robotId, nextMove);
-				
-				current.sem.release();
-				current = nextMove;
-				
-				//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
-				//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ si se va anula efectul benefic
-				current.givePositiveFeedback();
+				if (nextMove == null){
+					logger.debug(this.getName() + "held his ground");
+					try{
+						bar.enterBarrier();
+					} catch (InterruptedException ex) {
+						logger.error(this.getName() + "could not enter the barrier");
+					}
+				} else {
+					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
+					if (lastSteps.size() >= noStepsBack)
+						lastSteps.removeFirst();
+					env.makeAction(robotId, nextMove);
+					
+					current.sem.release();
+					current = nextMove;
+					
+					//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
+					//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ si se va anula efectul benefic
+					current.givePositiveFeedback();
+				}
 				/**
 				 * XXX aici ii dai un pos feedback de reward.
 				 * Mai incolo ii scazi tot atat. In final un drum prost o sa aiba 0
@@ -179,13 +193,13 @@ public class Robot extends Thread {
 				 * drumu parcurs si sa il marcam pozitiv - cam complicat tho).
 				 *  Zi-mi daca ti se pare o solutie mai buna.
 				 *  XXX un position prost va avea 0 la fel ca unul nedescoperit inca.
-				 */
-				
+				 */				
 			}
 		}
 		
 		logger.info("Landed on the promised land!");
 		env.removeFromMap(robotId);
+		bar.decThreadNum(); //	We must not wait for this robot anymore
 	}
 	
 	/**
@@ -214,42 +228,23 @@ public class Robot extends Thread {
 		int bestReward = -Integer.MIN_VALUE;
 		int tempReward;
 		
-		// If I fail to acquire a position I will recompute
-		// the bestPosition until it is available to me
-		// logic: the bestPosition might dynamically change - what is good now might
-		//	      not be good 2 steps from now when it will be available
-		while (true) {
-			for (Position i: available) {
-				tempReward = i.getFeedback() -
-					(i.getTopologicPostion() - target.getTopologicPostion());
-				if (tempReward > bestReward) {
-					bestReward = tempReward;
-					bestPos = i;
-				}
+		/**
+		 * I will try to get the absolute move.
+		 * If I fail I will hold my ground
+		 */
+		for (Position i: available) {
+			tempReward = i.getFeedback() -
+				(i.getTopologicPostion() - target.getTopologicPostion());
+			if (tempReward > bestReward) {
+				bestReward = tempReward;
+				bestPos = i;
 			}
-			
-			/* XXX not sure I'm licking this
-			 * poate ar trebui sa intoarca o pozitie si sa faca acquire
-			 * in functia principala?
-			 * toti roboti o sa comunice cu env. asa vad eu
-			 * nu o sa fie unul mai rapid ca altul
-			 * o sa fie sincronizati printr-o bariera.
-			 * discuss.
-			 * --- Nu cred ca e o idee buna.. daca facem asa e posibil
-			 * sa apara totusi race condition. Ex: A si B gasesc ambii pozitia
-			 * X ca fiind cea mai buna in urma apelului getNextMove. Doar unul singur
-			 * va putea sa prinda pozitia respectiva. Cel mai bine e sa iei pozitia aia
-			 * de cum ai gasit-o libera. Daca ai tu alta idee de cum sa mutam tryaquire de aici
-			 * in programul principal fara sa ramana o bucata mica de timp in care sa poata
-			 * aparea race conditions facem modificarea.
-			 * XXX adevarul e ca eu vedeam o abordare mai TB(S)
-			 * ma gandeam ceva de genul: fiecare transmite un mesaj la env
-			 * si astepata raspunsul, o coada de mesaje
-			 * nu cred ca nici asta ar fi fool-proof.
-			 */
-			if (bestPos != null && bestPos.sem.tryAcquire())
-				return bestPos;
 		}
+			
+		if (bestPos != null && bestPos.sem.tryAcquire())
+			return bestPos;
+		else
+			return null;
 	}
 	
 	Position getNextMoveAvailable(Vector<Position> available) {
@@ -260,28 +255,26 @@ public class Robot extends Thread {
 		PriorityQueue<PositionNReward> posQueue =
 			new PriorityQueue<PositionNReward>(11);
 		
-		//	Maybe all of my available positions are taken
-		//	If that happens, priorities might change until my next iteration through 
-		//		the positions, so I might as well compute them again
-		while (true) {
-			// Priority queue used to store the order of positions
-			// The order is from greatest to lowest, so the comparator must be implemented like below			 
+		/**
+		 * I will the try the first best move available.
+		 * If all my neighbours are occupied I will hold my ground.
+		 */
+		
+		for (Position i: available) {
+			tempReward = i.getFeedback() -
+				(i.getTopologicPostion() - target.getTopologicPostion());
+			queueElement = new PositionNReward(i, tempReward);
+			posQueue.add(queueElement);
+		}
 			
-			for (Position i: available) {
-				tempReward = i.getFeedback() -
-					(i.getTopologicPostion() - target.getTopologicPostion());
-				queueElement = new PositionNReward(i, tempReward);
-				posQueue.add(queueElement);
-			}
-			
-			while (!posQueue.isEmpty()) {
-				nextMove = posQueue.poll().pos;
-				if (nextMove.sem.tryAcquire()) {
-					return nextMove;
-				}
+		while (!posQueue.isEmpty()) {
+			nextMove = posQueue.poll().pos;
+			if (nextMove.sem.tryAcquire()) {
+				return nextMove;
 			}
 		}
 		
+		return null;		
 	}
 	
 	void removeDeadEnds(Vector<Position> adjacent) {
