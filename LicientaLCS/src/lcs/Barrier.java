@@ -20,6 +20,7 @@ public class Barrier {
 		noThreadCurrent ++;
 		if (noThreadCurrent == noThreadsMax){			
 			noThreadCurrent = 0;
+			System.out.println("------------------");
 			notifyAll();
 		}
 		else{			
