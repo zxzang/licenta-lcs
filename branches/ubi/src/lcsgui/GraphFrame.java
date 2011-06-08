@@ -1,21 +1,13 @@
 package lcsgui;
 
-import java.awt.Dimension;
+import org.ubiety.ubigraph.UbigraphClient;
 
-import javax.swing.JFrame;
-
-import lcs.Edge;
 import lcs.Environment;
-import edu.uci.ics.jung.algorithms.layout.FRLayout2;
-import edu.uci.ics.jung.algorithms.layout.Layout;
-import edu.uci.ics.jung.visualization.BasicVisualizationServer;
-import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
-import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 /**
  * A gui for the {@link Environment} type.
  */
-public class GraphFrame extends JFrame {
+public class GraphFrame {
 	/**
 	 * Serial Version UID.
 	 * Eclipse wouldn't shut up about it.
@@ -27,43 +19,17 @@ public class GraphFrame extends JFrame {
 	 */
 	private Environment env;
 	
-	/**
-	 * The width of the frame.
-	 */
-	static final int WIDTH = 1024;
-	
-	/**
-	 * The height of the frame.
-	 */
-	static final int HEIGHT = 800;
+	private UbigraphClient graph = new UbigraphClient(url);
 	
 	/**
 	 * Constructor for the class.
 	 * @param e - the {@link Environment} to be displayed.
+	 * @param address - the ubi server for visualization. 
 	 */
-	public GraphFrame(final Environment e) {
-		super("LCS System");
+	public GraphFrame(final Environment e, final String address) {
 		this.env = e;
 		
-		Layout<lcs.Position, Edge> layout =
-			new FRLayout2<lcs.Position, Edge>(this.env.getGraph());
-		layout.setSize(new Dimension(WIDTH, HEIGHT));
-		
-		BasicVisualizationServer<lcs.Position, Edge> vv = new
-			BasicVisualizationServer<lcs.Position, Edge>(layout);
-		vv.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<lcs.Position>());
-		vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<Edge>());
-		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
-		
-		this.getContentPane().add(vv);
-		
-		this.setBounds(0, 0, WIDTH, HEIGHT);
-		this.addWindowListener(new GraphWindowCloser());
-		this.setVisible(true);
+		graph = new UbigraphClient(address);
 	}
-	
-	// TODO add mouse listeners
-	// feature to click a node and get info on it
 
 }
