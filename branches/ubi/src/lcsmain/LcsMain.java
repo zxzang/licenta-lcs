@@ -35,7 +35,7 @@ public class LcsMain {
 	 */
 	public static void main(final String[] args) {
 		
-		setLoggers();		
+		setLoggers();
 		
 		if (args.length != 2) {
 			System.err.println("Parameters: input.xml server_address.");
@@ -44,6 +44,7 @@ public class LcsMain {
 		
 		env = new Environment(args[0]);
 		gFrame = new GraphFrame(env, args[1]);
+		
 		env.addAgents(0);
 		env.startAgents();
 		/* TODO poate ar fi bine sa separam robotii de topologie 
