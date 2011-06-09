@@ -139,6 +139,8 @@ public class Robot extends Thread {
 			adjacentStr = "";
 			for(Position x:adjacent)
 				adjacentStr += x + " ";
+			logger.debug("Goal " + target + "[" + 
+					target.getTopologicPostion() + "]");
 			logger.debug("Valid adjacents: "+adjacentStr);
 
 			if (adjacent.size() == 1) { // we're stuck
@@ -332,10 +334,12 @@ public class Robot extends Thread {
 			if (toBlock) {
 				nextMove.blockRoute(current);
 				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
-				current.blockRoute(nextMove);
-				current.giveNegativeFeedback();
+				current.blockRoute(nextMove);				
 				aux.nR--;
 			}
+			//	--- Give negative feedback now is double off positive feedback
+			current.giveNegativeFeedback();
+			current.giveNegativeFeedback();
 			
 			noARoutes = aux.nR;
 			
