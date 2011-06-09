@@ -28,7 +28,7 @@ public class Position {
 	 *         the first and last node topologically sorted will always be
 	 *         negative hence it might never get chosen
 	 */
-	int reward;
+	static int reward;
 	
 	/**
 	 * The blocked routes from this position.
@@ -118,6 +118,14 @@ public class Position {
 		this.topPos = -1;
 		this.pheromone = 0;
 		this.userVar = 0;
+	}
+	
+	/**
+	 * Sets the reward given to all the positions.
+	 * @param reward - the value to be given.
+	 */
+	public static void setReward(int reward) {
+		Position.reward = reward;
 	}
 
 	/**
