@@ -139,7 +139,7 @@ public class Robot extends Thread {
 			adjacentStr = "";
 			for(Position x:adjacent)
 				adjacentStr += x + " ";
-			//logger.debug("Valid adjacents: "+adjacentStr);
+			logger.debug("Valid adjacents: "+adjacentStr);
 
 			if (adjacent.size() == 1) { // we're stuck
 				logger.debug(getName() + " is on his way backwards");
@@ -177,9 +177,8 @@ public class Robot extends Thread {
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
 						lastSteps.removeFirst();
-					env.makeAction(robotId, nextMove);
+					env.makeAction(robotId, nextMove);					
 					
-					current.sem.release();
 					current = nextMove;
 					
 					//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
@@ -291,6 +290,8 @@ public class Robot extends Thread {
 			
 		while (!posQueue.isEmpty()) {
 			nextMove = posQueue.poll().pos;
+			logger.debug("permits available on " + nextMove +
+					" : " + nextMove.sem.availablePermits());
 			if (nextMove.sem.tryAcquire()) {
 				logger.debug("acquired "+nextMove);
 				return nextMove;

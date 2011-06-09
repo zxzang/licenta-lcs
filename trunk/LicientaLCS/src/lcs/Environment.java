@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import javax.sql.rowset.spi.SyncResolver;
+
 import lcsmain.LcsMain;
 
 import org.apache.log4j.Logger;
@@ -336,10 +338,15 @@ public class Environment {
 	 * @param dst - the destination desired by the agent.
 	 * @return 0 / 1
 	 */
-	public final int makeAction(final int robotId, final Position dst) {
+	public final synchronized int makeAction(final int robotId, final Position dst) {
 		//logger.debug("MakeAction");
 		
 		Robot r = agents.get(robotId);		
+		Position intialPos = (Position) robotPos.get(robotId);
+		
+		//	Safeguard - let's not give the semaphore more permits than 1
+		if (intialPos.sem.availablePermits() == 0)
+			intialPos.sem.release();
 		robotPos.set(robotId, dst);
 		
 		logger.debug(r.getName() + " got to " + dst + 
