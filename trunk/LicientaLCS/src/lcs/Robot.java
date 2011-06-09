@@ -245,7 +245,7 @@ public class Robot extends Thread {
 	Position getNextMoveAbsolute(Vector<Position> available) {
 		//logger.debug("eu " + getName() + " cer mutare absolute best");
 		Position bestPos = null;
-		// XXX what?! MIN_VALUE e deja negativ, you sure?
+		// XXX what?! MIN_VALUE e deja negativ, you sure? README
 		int bestReward = -Integer.MIN_VALUE;
 		int tempReward;
 		
