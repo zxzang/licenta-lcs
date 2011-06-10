@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Scanner;
 import java.util.Vector;
 
-import javax.swing.JFrame;
+import javax.sql.rowset.spi.SyncResolver;
 
-import lcsgui.RewardPanel;
 import lcsmain.LcsMain;
 
 import org.apache.log4j.Logger;
@@ -65,12 +63,6 @@ public class Environment {
 	 */
 	static Barrier robotBar;
 	
-	/* Debug */
-	JFrame rewardFrame;
-	RewardPanel rewardPan;
-	Scanner sc = new Scanner(System.in);
-	/* ----- */
-	
 	// TODO consider adding a barrier for sync + a sync function
 
 	/**
@@ -98,12 +90,13 @@ public class Environment {
 		
 		this.sortTop(); // XXX happy debuging
 		
+		// XXX teai gandit mult
 		logger.info("Target position is " + targetPosition + 
 				" with  top position " + targetPosition.getTopologicPostion());
 		
 		/* debug purpose */
 		
-		if (LcsMain.DEBUG) {
+		if (LcsMain.DEBUG){
 			ArrayList<Position> c = new ArrayList<Position>(
 					network.getVertices());
 			for (Iterator<Position> p = c.iterator(); p.hasNext();) {
@@ -116,11 +109,6 @@ public class Environment {
 			} catch (InterruptedException ex){}
 		}
 		
-		rewardPan = new RewardPanel(this);
-		rewardFrame = new JFrame();
-		rewardFrame.setSize(400, 200);
-		rewardFrame.add(rewardPan);
-		rewardFrame.setVisible(true);
 	}
 	
 	/**
@@ -154,10 +142,6 @@ public class Environment {
 			/* for each stored robot name */
 			for (String name : p.robotNames) {
 				Robot r;
-				
-				/*XXX asta nu cumva va adauga acelasi tip?
-				 * p.robotNames.size != tot numarul de roboti (= n final)
-				 */
 				if (n >= percentBestPos * p.robotNames.size())
 					r = new Robot(n, Robot.BESTAVAILABLE, stepsBack);
 				else 
@@ -174,27 +158,7 @@ public class Environment {
 		}
 		this.robotBar.setNumThreads(n);
 		this.setRobotPositions();
-		this.setPositionReward();
-	}
-	
-	/**
-	 * Sets the reward for the Position class.
-	 */
-	private void setPositionReward() {
-		int nVerts = network.getVertexCount();
-		int nAgents = agents.size();
-		int reward;
 		
-		if (nAgents == 0)
-			return;
-		if (nAgents == 1) {
-			reward = nVerts;
-		} else {
-			reward = nVerts / (nAgents - 1);
-		}
-		System.out.println(reward);
-		
-		Position.setReward(reward);
 	}
 	
 	/**
@@ -207,6 +171,16 @@ public class Environment {
 		}
 	}
 
+	/**
+	 * Set the vector that contains positions for the agents.
+	 * @param pos - the position vector.
+	 */
+	// --- ne mai trebuie asta ?
+	// was on the may-delete list
+	public final void setRobotPositions(final Vector<Position> pos) {
+		this.robotPos = pos;
+	}
+	
 	/**
 	 * Reads and constructs the graph from a GraphML.
 	 * @param filename - the filename which will be read.
@@ -301,6 +275,16 @@ public class Environment {
 	}
 
 	/**
+	 * Adds an agent to the Environment.
+	 * @param robot - agent to be added.
+	 */
+	public final void addAgent(final Robot robot) {
+		robot.setCurrentGoal(this.targetPosition);
+		robot.setEnvironment(this);
+		this.agents.add(robot); // TODO consider removing
+	}
+	
+	/**
 	 * Starts all agents.
 	 */
 	public final void startAgents() {
@@ -328,14 +312,14 @@ public class Environment {
 	 */
 	public final Vector<Position> getAdjacent(final Robot robot) {
 		Position robPos = robot.getCurrentPosition();
-		//LinkedList<Edge> outEdges = new LinkedList<Edge>(network.getOutEdges(robPos));
-		Vector<Position> ret =
-			new Vector<Position>(network.getNeighbors(robPos));
-		/*Vector<Position> ret = new Vector<Position>(outEdges.size());
+		LinkedList<Edge> outEdges = new LinkedList<Edge>(network.getOutEdges(robPos));
+		/*Vector<Position> ret =
+			new Vector<Position>(network.getNeighbors(robPos));*/
+		Vector<Position> ret = new Vector<Position>(outEdges.size());
 		
 		for (Edge e : outEdges) {
 			ret.add(network.getOpposite(robPos, e));
-		}*/
+		}
 		
 		return ret;
 	}
@@ -367,11 +351,6 @@ public class Environment {
 		
 		logger.debug(r.getName() + " got to " + dst + 
 				"[" + dst.getTopologicPostion() + "]");
-		
-		rewardPan.update();
-		
-		while(!sc.nextLine().equals(""));
-		
 		return 0;
 	}
 	
