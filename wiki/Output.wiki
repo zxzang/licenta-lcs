@@ -1,44 +1,84 @@
 DEBUG bender Environment - bender got to c10[9]
+
 ------------------
+
 DEBUG bender Robot - My turn - i am on c10
+
 DEBUG bender Robot - Goal c11[7]
+
 DEBUG bender Robot - Valid adjacents: c6 c7 
+
 DEBUG bender Robot - permits available on c7 : 1
+
 DEBUG bender Robot - acquired c7
+
 DEBUG bender Environment - bender got to c7[11]
+
 DEBUG data Robot - My turn - i am on c1
+
 DEBUG data Robot - Goal c11[7]
+
 DEBUG data Robot - Valid adjacents: c2 c3 c0 c4 
+
 DEBUG r2d2 Robot - My turn - i am on c0
+
 DEBUG r2d2 Robot - Goal c11[7]
+
 DEBUG r2d2 Robot - Valid adjacents: c2 c1 c7 
+
 DEBUG data Robot - permits available on c0 : 0
+
 DEBUG r2d2 Robot - permits available on c1 : 0
+
 DEBUG r2d2 Robot - permits available on c7 : 0
+
 DEBUG r2d2 Robot - permits available on c2 : 1
+
 DEBUG r2d2 Robot - acquired c2
+
 DEBUG data Robot - permits available on c2 : 1
+
 DEBUG data Robot - permits available on c4 : 1
+
 DEBUG data Robot - acquired c4
+
 DEBUG data Environment - data got to c4[2]
+
 
 DEBUG r2d2 Environment - r2d2 got to c2[4]
 
 ------------------
+
 DEBUG r2d2 Robot - My turn - i am on c2
+
 DEBUG r2d2 Robot - Goal c11[7]
+
 DEBUG r2d2 Robot - Valid adjacents: c6 c1 c3 c0 c4 
+
 DEBUG r2d2 Robot - permits available on c1 : 1
+
 DEBUG r2d2 Robot - acquired c1
+
 DEBUG r2d2 Environment - r2d2 got to c1[3]
+
 DEBUG data Robot - My turn - i am on c4
+
 DEBUG data Robot - Goal c11[7]
+
 DEBUG data Robot - Valid adjacents: c6 c2 c1 c5 
+
 DEBUG data Robot - permits available on c1 : 0
+
 DEBUG data Robot - permits available on c2 : 1
+
 DEBUG data Robot - acquired c2
+
 DEBUG bender Robot - My turn - i am on c7
+
 DEBUG bender Robot - Goal c11[7]
+
 DEBUG bender Robot - Valid adjacents: c10 c8 c0 
+
 DEBUG bender Robot - permits available on c0 : 1
+
 DEBUG bender Robot - acquired c0
