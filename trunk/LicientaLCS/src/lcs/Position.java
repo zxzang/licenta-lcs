@@ -121,13 +121,13 @@ public class Position {
 	}
 	
 	/**
-     * Sets the reward given to all the positions.
-     * @param reward - the value to be given.
-     */
-    public static void setReward(int reward) {
-            Position.reward = reward;
-    }
-    
+	 * Sets the reward given to all the positions.
+	 * @param reward - the value to be given.
+	 */
+	public static void setReward(int reward) {
+		Position.reward = reward;
+	}
+	
 	/**
 	 * Set the name of this position.
 	 * @param name - name to be set.
@@ -187,7 +187,7 @@ public class Position {
 	}
 
 	/**
-	 * Used by the Environment to retrieve the topological postion.
+	 * Used by the Environment to retrieve the topological position.
 	 * @return the sort position.
 	 */
 	protected final int getTopologicPostion() {

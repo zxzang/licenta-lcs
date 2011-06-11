@@ -139,8 +139,8 @@ public class Robot extends Thread {
 			adjacentStr = "";
 			for(Position x:adjacent)
 				adjacentStr += x + " ";
-			logger.debug("Goal " + target + "[" + 
-					target.getTopologicPostion() + "]");
+			//logger.debug("Goal " + target + "[" +
+			//		target.getTopologicPostion() + "]");
 			logger.debug("Valid adjacents: "+adjacentStr);
 
 			if (adjacent.size() == 1) { // we're stuck
@@ -179,7 +179,7 @@ public class Robot extends Thread {
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
 						lastSteps.removeFirst();
-					env.makeAction(robotId, nextMove);					
+					env.makeAction(robotId, nextMove);
 					
 					current = nextMove;
 					
@@ -300,7 +300,7 @@ public class Robot extends Thread {
 			}
 		}
 		
-		return null;		
+		return null;
 	}
 	
 	void removeDeadEnds(Vector<Position> adjacent) {

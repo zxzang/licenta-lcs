@@ -7,10 +7,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
 import java.util.Vector;
 
-import javax.sql.rowset.spi.SyncResolver;
+import javax.swing.JFrame;
 
+import lcsgui.RewardPanel;
 import lcsmain.LcsMain;
 
 import org.apache.log4j.Logger;
@@ -63,6 +66,12 @@ public class Environment {
 	 */
 	static Barrier robotBar;
 	
+	/* Debug */
+    JFrame rewardFrame;
+    RewardPanel rewardPan;
+    Scanner sc = new Scanner(System.in);
+    /* ----- */
+    
 	// TODO consider adding a barrier for sync + a sync function
 
 	/**
@@ -88,20 +97,21 @@ public class Environment {
 		
 		this.getTarget();
 		
-		this.sortTop(); // XXX happy debuging
+		//this.sortTop(); // XXX happy debuging
+		//this.bfs();
+		this.dfs();
 		
-		// XXX teai gandit mult
 		logger.info("Target position is " + targetPosition + 
-				" with  top position " + targetPosition.getTopologicPostion());
+				" with top position " + targetPosition.getTopologicPostion());
 		
 		/* debug purpose */
 		
-		if (LcsMain.DEBUG){
+		if (LcsMain.DEBUG) {
 			ArrayList<Position> c = new ArrayList<Position>(
 					network.getVertices());
 			for (Iterator<Position> p = c.iterator(); p.hasNext();) {
 				Position pos = p.next();
-				logger.debug(pos + "with top " + pos.getTopologicPostion());
+				logger.debug(pos + " with top " + pos.getTopologicPostion());
 			}
 	
 			try{
@@ -109,6 +119,11 @@ public class Environment {
 			} catch (InterruptedException ex){}
 		}
 		
+		/*rewardPan = new RewardPanel(this);
+		rewardFrame = new JFrame();
+		rewardFrame.setSize(400, 200);
+		rewardFrame.add(rewardPan);
+		rewardFrame.setVisible(true);*/
 	}
 	
 	/**
@@ -142,6 +157,9 @@ public class Environment {
 			/* for each stored robot name */
 			for (String name : p.robotNames) {
 				Robot r;
+				/*XXX asta nu cumva va adauga acelasi tip?
+                 * p.robotNames.size != tot numarul de roboti (= n final)
+                 */
 				if (n >= percentBestPos * p.robotNames.size())
 					r = new Robot(n, Robot.BESTAVAILABLE, stepsBack);
 				else 
@@ -158,7 +176,28 @@ public class Environment {
 		}
 		this.robotBar.setNumThreads(n);
 		this.setRobotPositions();
+
+       // this.setPositionReward();
+	}
+	
+	/**
+	 * Sets the reward for the Position class.
+	 */
+	private void setPositionReward() {
+		int nVerts = network.getVertexCount();
+		int nAgents = agents.size();
+		int reward;
 		
+		if (nAgents == 0)
+		        return;
+		if (nAgents == 1) {
+		        reward = nVerts;
+		} else {
+		        reward = nVerts / (nAgents - 1);
+		}
+		logger.debug("Position reward set to " + reward);
+		
+		Position.setReward(reward);
 	}
 	
 	/**
@@ -169,16 +208,6 @@ public class Environment {
 		for (Robot r : agents) {
 			robotPos.add(r.getCurrentPosition());
 		}
-	}
-
-	/**
-	 * Set the vector that contains positions for the agents.
-	 * @param pos - the position vector.
-	 */
-	// --- ne mai trebuie asta ?
-	// was on the may-delete list
-	public final void setRobotPositions(final Vector<Position> pos) {
-		this.robotPos = pos;
 	}
 	
 	/**
@@ -210,7 +239,51 @@ public class Environment {
 		
 		this.network = graphReader.readGraph();
 	}
-
+	
+	private void bfs() {
+		LinkedList<Position> toSearch = new LinkedList<Position>();
+		
+		targetPosition.setTopologicPostion(0);
+		targetPosition.userVar = 1;
+		toSearch.add(targetPosition);
+		
+		while (toSearch.isEmpty() == false) {
+			Position p = toSearch.pop();
+			Collection<Position> neigh = network.getNeighbors(p);
+			
+			for (Position n : neigh) {
+				if (n.userVar == 0) {
+					n.userVar = 1;
+					n.setTopologicPostion(p.getTopologicPostion()+1);
+					toSearch.add(n);
+				}
+			}
+		}
+		
+	}
+	
+	private void dfs() {
+		LinkedList<Position> order = new LinkedList<Position>();
+		explore(targetPosition, order);
+		int i = 0;
+		for (Position p : order) {
+			System.out.println(p + " " + i);
+			i++;
+		}
+		
+	}
+	
+	private void explore(Position vert, LinkedList<Position> queue) {
+		Collection<Position> neigh = network.getNeighbors(vert);
+		vert.userVar = 1;
+		for (Position n : neigh) { 
+			if (n.userVar == 0) {
+				explore(n, queue);
+			}
+		}
+		queue.addFirst(vert);
+	}
+	
 	/**
 	 * Used to topologically sort the graph.
 	 */
@@ -272,16 +345,6 @@ public class Environment {
 			//add n to L
 			l.add(n);
 		}
-	}
-
-	/**
-	 * Adds an agent to the Environment.
-	 * @param robot - agent to be added.
-	 */
-	public final void addAgent(final Robot robot) {
-		robot.setCurrentGoal(this.targetPosition);
-		robot.setEnvironment(this);
-		this.agents.add(robot); // TODO consider removing
 	}
 	
 	/**
@@ -351,6 +414,11 @@ public class Environment {
 		
 		logger.debug(r.getName() + " got to " + dst + 
 				"[" + dst.getTopologicPostion() + "]");
+		
+		//rewardPan.update();
+		
+		while(!sc.nextLine().equals(""));
+		
 		return 0;
 	}
 	
