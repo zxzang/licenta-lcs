@@ -11,7 +11,7 @@ public class LcsMain {
 	 */
 	static Environment env;
 	
-	public final static boolean DEBUG = true;
+	public final static boolean DEBUG = false;
 	
 	/**
 	 * The {@link GraphFrame} used for visualizing the {@link Environment}.
@@ -43,9 +43,9 @@ public class LcsMain {
 		}
 		
 		env = new Environment(args[0]);
-		//gFrame = new GraphFrame(env);
+		gFrame = new GraphFrame(env);
 		env.addAgents(0);
-		//env.startAgents();
+		env.startAgents();
 		/* TODO poate ar fi bine sa separam robotii de topologie 
 				xmlul sa contina doar cum arata graful si atat
 			XXX yeah ... asta a fost o chestie de dragul de a avea ceva ce merge
