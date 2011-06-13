@@ -30,8 +30,10 @@ public class Barrier {
 	
 	public synchronized void decThreadNum(){
 		noThreadsMax--;
-		if (noThreadCurrent == noThreadsMax)
+		if (noThreadCurrent == noThreadsMax){
+			noThreadCurrent = 0;
 			notifyAll();			
+		}
 	}	
 
 }

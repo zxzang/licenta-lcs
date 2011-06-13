@@ -7,8 +7,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.Vector;
 
+import javax.swing.JFrame;
+
+import lcsgui.RewardPanel;
 import lcsmain.LcsMain;
 
 import org.apache.log4j.Logger;
@@ -42,6 +46,11 @@ public class Environment {
 	Vector<Robot> agents;
 	
 	/**
+	 * The number of agents active in the environment.
+	 */
+	int activeAgents;
+	
+	/**
 	 * The network in the Environment.
 	 */
 	Graph<Position, Edge> network;
@@ -61,15 +70,19 @@ public class Environment {
 	 */
 	static Barrier robotBar;
 	
-	// TODO consider adding a barrier for sync + a sync function
-
+	/* Debug */
+    JFrame rewardFrame;
+    RewardPanel rewardPan;
+    Scanner sc = new Scanner(System.in);
+    /* ----- */
+    
 	/**
 	 * Basic constructor.
 	 * @param input - the filename from which the graph is to be read.
 	 */
 	public Environment(final String input) {
 		this.agents = new Vector<Robot>();
-		this.robotBar = new Barrier();
+		Environment.robotBar = new Barrier();
 		
 		try {
 			this.getGraph(input);
@@ -86,20 +99,21 @@ public class Environment {
 		
 		this.getTarget();
 		
-		this.sortTop(); // XXX happy debuging
+		//this.sortTop();
+		//this.bfs();
+		this.dfs();
 		
-		// XXX teai gandit mult
 		logger.info("Target position is " + targetPosition + 
-				" with  top position " + targetPosition.getTopologicPostion());
+				" with top position " + targetPosition.getTopologicPostion());
 		
 		/* debug purpose */
 		
-		if (LcsMain.DEBUG){
+		if (LcsMain.DEBUG) {
 			ArrayList<Position> c = new ArrayList<Position>(
 					network.getVertices());
 			for (Iterator<Position> p = c.iterator(); p.hasNext();) {
 				Position pos = p.next();
-				logger.debug(pos + "with top " + pos.getTopologicPostion());
+				logger.debug(pos + " with top " + pos.getTopologicPostion());
 			}
 	
 			try{
@@ -107,6 +121,11 @@ public class Environment {
 			} catch (InterruptedException ex){}
 		}
 		
+		/*rewardPan = new RewardPanel(this);
+		rewardFrame = new JFrame();
+		rewardFrame.setSize(400, 200);
+		rewardFrame.add(rewardPan);
+		rewardFrame.setVisible(true);*/
 	}
 	
 	/**
@@ -127,7 +146,7 @@ public class Environment {
 	 * 		on the bestPosition behavior
 	 */
 	public void addAgents(double percentBestPos) {
-		int n = 0;
+		activeAgents = 0;
 		Collection<Position> verts = network.getVertices();
 		this.agents = new Vector<Robot>();
 		
@@ -140,23 +159,47 @@ public class Environment {
 			/* for each stored robot name */
 			for (String name : p.robotNames) {
 				Robot r;
-				if (n >= percentBestPos * p.robotNames.size())
-					r = new Robot(n, Robot.BESTAVAILABLE, stepsBack);
+				/*XXX asta nu cumva va adauga acelasi tip?
+                 * p.robotNames.size != tot numarul de roboti (= n final)
+                 */
+				if (activeAgents >= percentBestPos * p.robotNames.size())
+					r = new Robot(activeAgents, Robot.BESTAVAILABLE, stepsBack);
 				else 
-					r = new Robot(n, Robot.BESTPOSITION, stepsBack);
+					r = new Robot(activeAgents, Robot.BESTPOSITION, stepsBack);
 				r.setName(name);
 				r.setCurrentGoal(this.targetPosition);
 				r.setStartPosition(p);
 				r.setEnvironment(this);
 				this.agents.add(r);				
-				n++;
+				activeAgents++;
 				logger.info("Added agent " + r.getName());
 			}
 			p.robotNames = null;
 		}
-		this.robotBar.setNumThreads(n);
+		Environment.robotBar.setNumThreads(activeAgents);
 		this.setRobotPositions();
+
+       // this.setPositionReward();
+	}
+	
+	/**
+	 * Sets the reward for the Position class.
+	 */
+	private void setPositionReward() {
+		int nVerts = network.getVertexCount();
+		int nAgents = agents.size();
+		int reward;
 		
+		if (nAgents == 0)
+		        return;
+		if (nAgents == 1) {
+		        reward = nVerts;
+		} else {
+		        reward = nVerts / (nAgents - 1);
+		}
+		logger.debug("Position reward set to " + reward);
+		
+		Position.setReward(reward);
 	}
 	
 	/**
@@ -167,16 +210,6 @@ public class Environment {
 		for (Robot r : agents) {
 			robotPos.add(r.getCurrentPosition());
 		}
-	}
-
-	/**
-	 * Set the vector that contains positions for the agents.
-	 * @param pos - the position vector.
-	 */
-	// --- ne mai trebuie asta ?
-	// was on the may-delete list
-	public final void setRobotPositions(final Vector<Position> pos) {
-		this.robotPos = pos;
 	}
 	
 	/**
@@ -208,7 +241,52 @@ public class Environment {
 		
 		this.network = graphReader.readGraph();
 	}
-
+	
+	private void bfs() {
+		LinkedList<Position> toSearch = new LinkedList<Position>();
+		
+		targetPosition.setTopologicPostion(0);
+		targetPosition.userVar = 1;
+		toSearch.add(targetPosition);
+		
+		while (toSearch.isEmpty() == false) {
+			Position p = toSearch.pop();
+			Collection<Position> neigh = network.getNeighbors(p);
+			
+			for (Position n : neigh) {
+				if (n.userVar == 0) {
+					n.userVar = 1;
+					n.setTopologicPostion(p.getTopologicPostion()+1);
+					toSearch.add(n);
+				}
+			}
+		}
+		
+	}
+	
+	private void dfs() {
+		LinkedList<Position> order = new LinkedList<Position>();
+		explore(targetPosition, order);
+		int i = 0;
+		for (Position p : order) {
+			//System.out.println(p + " " + i);
+			p.setTopologicPostion(i);
+			i++;
+		}
+		
+	}
+	
+	private void explore(Position vert, LinkedList<Position> queue) {
+		Collection<Position> neigh = network.getNeighbors(vert);
+		vert.userVar = 1;
+		for (Position n : neigh) { 
+			if (n.userVar == 0) {
+				explore(n, queue);
+			}
+		}
+		queue.addFirst(vert);
+	}
+	
 	/**
 	 * Used to topologically sort the graph.
 	 */
@@ -236,11 +314,9 @@ public class Environment {
 			this.visit(pos, l);
 		}
 		
-		// TODO daca e bine: foreach node setTop
 		int i = 0;
 		for (Iterator<Position> iter = l.iterator(); iter.hasNext(); i++) {
 			Position p = iter.next();
-			//System.out.println(p + " " + i);
 			p.setTopologicPostion(i);
 		}
 
@@ -270,16 +346,6 @@ public class Environment {
 			//add n to L
 			l.add(n);
 		}
-	}
-
-	/**
-	 * Adds an agent to the Environment.
-	 * @param robot - agent to be added.
-	 */
-	public final void addAgent(final Robot robot) {
-		robot.setCurrentGoal(this.targetPosition);
-		robot.setEnvironment(this);
-		this.agents.add(robot); // TODO consider removing
 	}
 	
 	/**
@@ -336,22 +402,36 @@ public class Environment {
 	 * @param dst - the destination desired by the agent.
 	 * @return 0 / 1
 	 */
-	public final int makeAction(final int robotId, final Position dst) {
+	public final synchronized int makeAction(final int robotId, final Position dst) {
 		//logger.debug("MakeAction");
 		
 		Robot r = agents.get(robotId);		
+		Position intialPos = (Position) robotPos.get(robotId);
+		
+		//	Safeguard - let's not give the semaphore more permits than 1
+		if (intialPos.sem.availablePermits() == 0)
+			intialPos.sem.release();
 		robotPos.set(robotId, dst);
 		
 		logger.debug(r.getName() + " got to " + dst + 
 				"[" + dst.getTopologicPostion() + "]");
+		
+		//rewardPan.update();
+		
+		//while(!sc.nextLine().equals(""));
+		
 		return 0;
 	}
 	
-	public final void removeFromMap(int robotId){
+	public final void removeFromMap(int robotId) {
 		targetPosition.sem.release();
 		Robot r = agents.get(robotId);
 		logger.debug(r.getName() + " ejected from map");
 		//robotPos.set(robotId, -1);
+		activeAgents--;
+		if (activeAgents == 0) {
+			logger.info("All agents ejected from map.");
+		}
 	}
 
 }

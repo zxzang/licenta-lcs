@@ -139,7 +139,9 @@ public class Robot extends Thread {
 			adjacentStr = "";
 			for(Position x:adjacent)
 				adjacentStr += x + " ";
-			//logger.debug("Valid adjacents: "+adjacentStr);
+			//logger.debug("Goal " + target + "[" +
+			//		target.getTopologicPostion() + "]");
+			logger.debug("Valid adjacents: "+adjacentStr);
 
 			if (adjacent.size() == 1) { // we're stuck
 				logger.debug(getName() + " is on his way backwards");
@@ -179,11 +181,10 @@ public class Robot extends Thread {
 						lastSteps.removeFirst();
 					env.makeAction(robotId, nextMove);
 					
-					current.sem.release();
 					current = nextMove;
 					
 					//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
-					//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ si se va anula efectul benefic
+					//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ dublu si se va anula efectul benefic
 					current.givePositiveFeedback();
 					
 					try{
@@ -192,30 +193,7 @@ public class Robot extends Thread {
 						logger.error(this.getName() + "could not enter the barrier");
 					}
 
-				}
-				/**
-				 * XXX aici ii dai un pos feedback de reward.
-				 * Mai incolo ii scazi tot atat. In final un drum prost o sa aiba 0
-				 * si nu ceva < 0.
-				 * 
-				 * --- eu am gandit ca nu e relevanta neaparat o recompensa negativa
-				 * Un robot va alege intre doua pozitii x si y pe cea ce recompensa mai mare,
-				 * nu pe cea cu recompensa pozitiva. Asa ca pentru el e acceasi chestie
-				 * daca vede o recompensa pozitiva mica sau una negativa. Blocarea rutelor 
-				 * nu sta in semnul recompensei ci in structura aia de rute blocate.
-				 * Ideea de a ii da o recompensa si apoi de a o lua inapoi e sa 
-				 * presupun ca robotu merge bun and pat him on the head dar daca se dovedeste
-				 * ca e gresit sa ii iau recompensa inapoi pt nu a induce in eroare alti roboti.
-				 * Am presupus ca un drum e drum bun until proven otherwise.
-				 * Am putea sa nu alocam deloc recompensa si sa dam o recompensa pozitiva
-				 * ultimilor 10 pasi atunci cand robotul chiar ajunge in pozitia finala
-				 * (un fel de GoBackNMark doar ca varianta pozitiva). Dar nu mi se pare o
-				 * varianta buna - ar trebui sa presupunem ca cel mai lung drum are un anumit
-				 * numar de pasi - gotta think about it ( o varianta ar fi sa tinem minte tot
-				 * drumu parcurs si sa il marcam pozitiv - cam complicat tho).
-				 *  Zi-mi daca ti se pare o solutie mai buna.
-				 *  XXX un position prost va avea 0 la fel ca unul nedescoperit inca.
-				 */				
+				}							
 			}
 		}
 		
@@ -291,13 +269,15 @@ public class Robot extends Thread {
 			
 		while (!posQueue.isEmpty()) {
 			nextMove = posQueue.poll().pos;
+			logger.debug("permits available on " + nextMove +
+					" : " + nextMove.sem.availablePermits());
 			if (nextMove.sem.tryAcquire()) {
 				logger.debug("acquired "+nextMove);
 				return nextMove;
 			}
 		}
 		
-		return null;		
+		return null;
 	}
 	
 	void removeDeadEnds(Vector<Position> adjacent) {
@@ -331,10 +311,12 @@ public class Robot extends Thread {
 			if (toBlock) {
 				nextMove.blockRoute(current);
 				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
-				current.blockRoute(nextMove);
-				current.giveNegativeFeedback();
+				current.blockRoute(nextMove);				
 				aux.nR--;
 			}
+			//	--- Give negative feedback now is double off positive feedback
+			current.giveNegativeFeedback();
+			current.giveNegativeFeedback();
 			
 			noARoutes = aux.nR;
 			
