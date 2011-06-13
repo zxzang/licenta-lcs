@@ -173,14 +173,6 @@ public class Position {
 	}
 	
 	/**
-	 * Modifies the reward of this position.
-	 * @param feed - the amount to be added to the current reward.
-	 */
-	public final void giveFeedback(int feed) {
-		this.pheromone += feed;
-	}
-	
-	/**
 	 * Gives the current feedback of this position.
 	 * @return feedback left by previous agents.
 	 */

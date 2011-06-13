@@ -60,7 +60,7 @@ public class Environment {
 	/**
 	 * The number of steps a robot will backtrack.
 	 */
-	public int stepsBack = 10;
+	public int stepsBack;
 	
 	/**
 	 * Logger from mains
@@ -165,9 +165,9 @@ public class Environment {
                  * p.robotNames.size != tot numarul de roboti (= n final)
                  */
 				if (activeAgents >= percentBestPos * p.robotNames.size())
-					r = new Robot(activeAgents, Robot.BESTAVAILABLE, stepsBack);
+					r = new Robot(activeAgents, Robot.BESTAVAILABLE);
 				else 
-					r = new Robot(activeAgents, Robot.BESTPOSITION, stepsBack);
+					r = new Robot(activeAgents, Robot.BESTPOSITION);
 				r.setName(name);
 				r.setCurrentGoal(this.targetPosition);
 				r.setStartPosition(p);
@@ -181,7 +181,18 @@ public class Environment {
 		Environment.robotBar.setNumThreads(activeAgents);
 		this.setRobotPositions();
 
-       // this.setPositionReward();
+		//this.setPositionReward();
+		this.setStepsBack();
+	}
+	
+	/**
+	 * Sets the number of steps an agent is to retreat.
+	 */
+	private void setStepsBack() {
+		int steps = network.getVertexCount() / activeAgents;
+		for (Robot agent : agents) {
+			agent.setNumberStepsBack(steps);
+		}
 	}
 	
 	/**
