@@ -44,7 +44,7 @@ public class LcsMain {
 		
 		env = new Environment(args[0]);
 		gFrame = new GraphFrame(env);
-		env.addAgents(0);
+		env.addAgents(1);
 		env.startAgents();
 		/* TODO poate ar fi bine sa separam robotii de topologie 
 				xmlul sa contina doar cum arata graful si atat

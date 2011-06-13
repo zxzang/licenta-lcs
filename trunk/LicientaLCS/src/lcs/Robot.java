@@ -57,6 +57,7 @@ public class Robot extends Thread {
 	int robotId;	
 	private static Logger logger = Logger.getLogger("Robot");
 	private static Barrier bar = Environment.robotBar;
+	private boolean foundPath;
 	
 	/**
 	 * Number of robots instantiated of this class
@@ -84,6 +85,7 @@ public class Robot extends Thread {
 		noStepsBack = nSteps;
 		lastSteps = new LinkedList<PositionNRoutes>();
 		Robot.noRobots++;
+		this.foundPath = false;
 	}
 	
 	/**
@@ -176,6 +178,18 @@ public class Robot extends Thread {
 						logger.error(this.getName() + "could not enter the barrier");
 					}
 				} else {
+					/**
+					 * If this has proven to be a good position reward the 
+					 * 	lastSteps with half of my reward.
+					 */
+					int reward = nextMove.pheromone / 2;
+					if (reward > 0 && !foundPath){
+						for(PositionNRoutes x:lastSteps)
+							x.pos.givePositiveFeedback(reward);
+						foundPath = true;
+					}
+
+					
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
 						lastSteps.removeFirst();
@@ -183,9 +197,7 @@ public class Robot extends Thread {
 					
 					current = nextMove;
 					
-					//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
-					//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ dublu si se va anula efectul benefic
-					current.givePositiveFeedback();
+						
 					
 					try{
 						bar.enterBarrier();
@@ -314,9 +326,10 @@ public class Robot extends Thread {
 				current.blockRoute(nextMove);				
 				aux.nR--;
 			}
-			//	--- Give negative feedback now is double off positive feedback
+			
+			//	--- Give negative feedback now is double off positive feedback			
 			current.giveNegativeFeedback();
-			current.giveNegativeFeedback();
+			
 			
 			noARoutes = aux.nR;
 			

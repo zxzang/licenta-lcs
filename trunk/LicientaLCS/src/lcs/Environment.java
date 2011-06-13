@@ -190,10 +190,11 @@ public class Environment {
 	private void setPositionReward() {
 		int nVerts = network.getVertexCount();
 		int nAgents = agents.size();
-		int reward;
+		int reward = 10;
 		
 		if (nAgents == 0)
 		        return;
+		
 		if (nAgents == 1) {
 		        reward = nVerts;
 		} else {
@@ -201,7 +202,8 @@ public class Environment {
 		}
 		logger.debug("Position reward set to " + reward);
 		
-		Position.setReward(reward);
+		Position.setMinReward(reward);
+		//targetPosition.givePositiveFeedback(reward * Math.pow(2, arg1));
 	}
 	
 	/**
