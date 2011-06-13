@@ -1,5 +1,9 @@
-package lcs;
+package graph;
 
+
+import lcs.Edge;
+import lcs.Environment;
+import lcs.Position;
 
 import org.apache.commons.collections15.Transformer;
 

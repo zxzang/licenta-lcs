@@ -148,7 +148,7 @@ public class Position {
 	 * Used by the VertexTransformer to add a name to the position.
 	 * @param name - the name of the robot.
 	 */
-	protected void addRobot(String name) {
+	public void addRobot(String name) {
 		if (this.robotNames == null)
 			robotNames = new LinkedList<String>();
 		robotNames.add(name);

@@ -21,7 +21,9 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.io.GraphIOException;
 import edu.uci.ics.jung.io.graphml.GraphMLReader2;
 import graph.EdgeTransformer;
+import graph.GraphTransformer;
 import graph.HyperEdgeTransformer;
+import graph.VertexTransformer;
 
 /**
  * Used to synchronize the agents and give them the input they need.
@@ -58,7 +60,7 @@ public class Environment {
 	/**
 	 * The number of steps a robot will backtrack.
 	 */
-	protected int stepsBack = 10;
+	public int stepsBack = 10;
 	
 	/**
 	 * Logger from mains

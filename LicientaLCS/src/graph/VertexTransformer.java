@@ -1,6 +1,8 @@
-package lcs;
+package graph;
 
 import java.util.Map;
+
+import lcs.Position;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
