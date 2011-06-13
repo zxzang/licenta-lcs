@@ -214,7 +214,7 @@ public class Environment {
 		logger.debug("Position reward set to " + reward);
 		
 		Position.setMinReward(reward);
-		//targetPosition.givePositiveFeedback(reward * Math.pow(2, arg1));
+		targetPosition.givePositiveFeedback(reward + reward * 2 * nVerts);
 	}
 	
 	/**
@@ -447,6 +447,15 @@ public class Environment {
 		if (activeAgents == 0) {
 			logger.info("All agents ejected from map.");
 		}
+	}
+	
+	public int getReducedReward(Position target){
+		int res = target.pheromone;
+		int nVerts = network.getVertexCount();
+		
+		res -= 2 * nVerts;
+		
+		return res;		
 	}
 
 }

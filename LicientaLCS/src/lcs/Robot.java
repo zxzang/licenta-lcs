@@ -188,7 +188,7 @@ public class Robot extends Thread {
 					 * If this has proven to be a good position reward the 
 					 * 	lastSteps with half of my reward.
 					 */
-					int reward = nextMove.pheromone / 2;
+					int reward = env.getReducedReward(nextMove);
 					if (reward > 0 && !foundPath){
 						for(PositionNRoutes x:lastSteps)
 							x.pos.givePositiveFeedback(reward);
