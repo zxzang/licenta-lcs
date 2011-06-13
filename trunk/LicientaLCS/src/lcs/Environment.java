@@ -267,7 +267,8 @@ public class Environment {
 		explore(targetPosition, order);
 		int i = 0;
 		for (Position p : order) {
-			System.out.println(p + " " + i);
+			//System.out.println(p + " " + i);
+			p.setTopologicPostion(i);
 			i++;
 		}
 		
