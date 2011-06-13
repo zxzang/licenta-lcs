@@ -4,17 +4,24 @@ import lcs.Environment;
 import lcsgui.GraphFrame;
 import org.apache.log4j.*;
 
+/**
+ * @author  Jay
+ */
 public class LcsMain {
 	
 	/**
-	 * The {@link Environment} used by the application.
+	 * The     {@link Environment}     used by the application.
+	 * @uml.property  name="env"
+	 * @uml.associationEnd  
 	 */
 	static Environment env;
 	
 	public final static boolean DEBUG = false;
 	
 	/**
-	 * The {@link GraphFrame} used for visualizing the {@link Environment}.
+	 * The     {@link GraphFrame}     used for visualizing the     {@link Environment}    .
+	 * @uml.property  name="gFrame"
+	 * @uml.associationEnd  
 	 */
 	static GraphFrame gFrame;
 	

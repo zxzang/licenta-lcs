@@ -6,6 +6,9 @@ import javax.swing.JTextField;
 import lcs.Environment;
 import lcs.Position;
 
+/**
+ * @author  Jay
+ */
 public class RewardPanel extends JPanel {
 
 	/**
@@ -13,11 +16,18 @@ public class RewardPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 8213435715847065200L;
 	
+	/**
+	 * @author  Jay
+	 */
 	class Field extends JTextField {
 		/**
 		 * Eclipse again.
 		 */
 		private static final long serialVersionUID = 1817060792260992613L;
+		/**
+		 * @uml.property  name="pos"
+		 * @uml.associationEnd  
+		 */
 		Position pos;
 		
 		public Field(Position pos) {
@@ -30,6 +40,10 @@ public class RewardPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * @uml.property  name="info"
+	 * @uml.associationEnd  multiplicity="(0 -1)"
+	 */
 	private Field info[];
 	
 	public RewardPanel(Environment env) {

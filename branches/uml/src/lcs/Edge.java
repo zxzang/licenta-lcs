@@ -2,18 +2,21 @@ package lcs;
 
 /**
  * Edge for connecting 2 Positions.
- * @author Iustin Dumitrescu
- *
+ * @author  Iustin Dumitrescu
  */
 public class Edge {
 	/**
 	 * The first position to which the edge is connected.
+	 * @uml.property  name="first"
+	 * @uml.associationEnd  
 	 */
 	Position first;
 	String firstName;
 
 	/**
 	 * The second position to which the edge is connected.
+	 * @uml.property  name="second"
+	 * @uml.associationEnd  
 	 */
 	Position second;
 	String secondName;
@@ -53,7 +56,8 @@ public class Edge {
 	
 	/**
 	 * Set the name with which the edge will be displayed.
-	 * @param name - to be displayed.
+	 * @param name  - to be displayed.
+	 * @uml.property  name="name"
 	 */
 	public void setName(String name) {
 		this.name = name;

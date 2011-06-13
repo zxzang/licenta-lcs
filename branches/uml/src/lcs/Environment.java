@@ -21,12 +21,13 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.io.GraphIOException;
 import edu.uci.ics.jung.io.graphml.GraphMLReader2;
 import graph.EdgeTransformer;
+import graph.GraphTransformer;
 import graph.HyperEdgeTransformer;
+import graph.VertexTransformer;
 
 /**
  * Used to synchronize the agents and give them the input they need.
- * @author Iustin Dumitrescu
- *
+ * @author  Iustin Dumitrescu
  */
 public class Environment {
 
@@ -37,6 +38,8 @@ public class Environment {
 
 	/**
 	 * The target that each robot is going for.
+	 * @uml.property  name="targetPosition"
+	 * @uml.associationEnd  
 	 */
 	Position targetPosition;
 
@@ -58,7 +61,7 @@ public class Environment {
 	/**
 	 * The number of steps a robot will backtrack.
 	 */
-	protected int stepsBack = 10;
+	public int stepsBack = 10;
 	
 	/**
 	 * Logger from mains
@@ -67,11 +70,17 @@ public class Environment {
 	
 	/**
 	 * Barrier used to sync robot moves
+	 * @uml.property  name="robotBar"
+	 * @uml.associationEnd  
 	 */
 	static Barrier robotBar;
 	
 	/* Debug */
     JFrame rewardFrame;
+    /**
+	 * @uml.property  name="rewardPan"
+	 * @uml.associationEnd  
+	 */
     RewardPanel rewardPan;
     Scanner sc = new Scanner(System.in);
     /* ----- */

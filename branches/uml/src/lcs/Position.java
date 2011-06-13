@@ -5,8 +5,7 @@ import java.util.concurrent.Semaphore;
 
 /**
  * Marks a node within the graph.
- * @author Iustin Dumitrescu
- *
+ * @author  Iustin Dumitrescu
  */
 public class Position {
 	/**
@@ -31,14 +30,14 @@ public class Position {
 	static int reward;
 	
 	/**
-	 * The blocked routes from this position.
-	 * A type of marking left by robots on the graph edges
+	 * The blocked routes from this position. A type of marking left by robots on the graph edges
+	 * @uml.property  name="blockedRoutes"
 	 */
 	LinkedList<Position> blockedRoutes;
 	
 	/**
-	 * Is this node a dead-end or not ?
-	 * Also, this will be established by one or more agents.
+	 * Is this node a dead-end or not ? Also, this will be established by one or more agents.
+	 * @uml.property  name="deadEnd"
 	 */
 	boolean deadEnd;
 
@@ -122,7 +121,8 @@ public class Position {
 	
 	/**
 	 * Sets the reward given to all the positions.
-	 * @param reward - the value to be given.
+	 * @param reward  - the value to be given.
+	 * @uml.property  name="reward"
 	 */
 	public static void setReward(int reward) {
 		Position.reward = reward;
@@ -148,7 +148,7 @@ public class Position {
 	 * Used by the VertexTransformer to add a name to the position.
 	 * @param name - the name of the robot.
 	 */
-	protected void addRobot(String name) {
+	public void addRobot(String name) {
 		if (this.robotNames == null)
 			robotNames = new LinkedList<String>();
 		robotNames.add(name);
@@ -206,7 +206,8 @@ public class Position {
 	
 	/**
 	 * Gets the blocked routes from this position.
-	 * @return a LinkedList of the blocked routes.
+	 * @return  a LinkedList of the blocked routes.
+	 * @uml.property  name="blockedRoutes"
 	 */
 	public final LinkedList<Position> getBlockedRoutes(){
 		return blockedRoutes;
@@ -214,7 +215,8 @@ public class Position {
 	
 	/**
 	 * Specifies if this position has no possible successors.
-	 * @return True if it is a dead end, false otherwise.
+	 * @return  True if it is a dead end, false otherwise.
+	 * @uml.property  name="deadEnd"
 	 */
 	public final boolean isDeadEnd(){
 		return deadEnd;

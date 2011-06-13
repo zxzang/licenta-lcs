@@ -1,5 +1,9 @@
-package lcs;
+package graph;
 
+
+import lcs.Edge;
+import lcs.Environment;
+import lcs.Position;
 
 import org.apache.commons.collections15.Transformer;
 
@@ -11,14 +15,17 @@ import edu.uci.ics.jung.io.graphml.GraphMetadata.EdgeDefault;
 
 /**
  * Used to create a graph from a GraphML.
- * @author Dumitrescu Iustin
- *
+ * @author  Dumitrescu Iustin
  */
 public class GraphTransformer implements
 		Transformer<GraphMetadata, Graph<Position, Edge>> {
 
 	private static final String StepsBack = "noStepsBack";
 	
+	/**
+	 * @uml.property  name="env"
+	 * @uml.associationEnd  
+	 */
 	Environment env;
 	
 	@Override
@@ -46,5 +53,4 @@ public class GraphTransformer implements
 	public GraphTransformer(Environment env) {
 		this.env = env;
 	}
-
 }

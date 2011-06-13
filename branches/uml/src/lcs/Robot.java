@@ -8,17 +8,18 @@ import org.apache.log4j.*;
 
 
 /**
- * 
- * @author Dascalu Sorin
- *
+ * @author  Dascalu Sorin
  */
 public class Robot extends Thread {
 
 	/**
-	 * Class that associates a certain position with the number
-	 * of available routes that go out of it.
+	 * Class that associates a certain position with the number of available routes that go out of it.
 	 */
 	static class PositionNRoutes {
+		/**
+		 * @uml.property  name="pos"
+		 * @uml.associationEnd  
+		 */
 		Position pos;
 		int nR;
 		public PositionNRoutes(Position x, int y) {
@@ -31,6 +32,10 @@ public class Robot extends Thread {
 	 * Class that associates a certain position with the its reward.
 	 */
 	static class PositionNReward implements Comparable<PositionNReward> {
+		/**
+		 * @uml.property  name="pos"
+		 * @uml.associationEnd  
+		 */
 		Position pos;
 		int reward;
 		public PositionNReward(Position x, int y) {
@@ -49,13 +54,29 @@ public class Robot extends Thread {
 		}
 	}
 	
+	/**
+	 * @uml.property  name="current"
+	 * @uml.associationEnd  
+	 */
 	Position current;
+	/**
+	 * @uml.property  name="target"
+	 * @uml.associationEnd  
+	 */
 	Position target;
+	/**
+	 * @uml.property  name="env"
+	 * @uml.associationEnd  
+	 */
 	Environment env;
 	LinkedList<PositionNRoutes> lastSteps;
 	int noStepsBack;
 	int robotId;	
 	private static Logger logger = Logger.getLogger("Robot");
+	/**
+	 * @uml.property  name="bar"
+	 * @uml.associationEnd  
+	 */
 	private static Barrier bar = Environment.robotBar;
 	
 	/**
@@ -348,6 +369,29 @@ public class Robot extends Thread {
 				logger.error(getName() + "could not enter barrier");
 			}
 		}
+	}
+
+	/**
+	 * @uml.property  name="test"
+	 */
+	private float test = 13;
+
+	/**
+	 * Getter of the property <tt>test</tt>
+	 * @return  Returns the test.
+	 * @uml.property  name="test"
+	 */
+	public float getTest() {
+		return test;
+	}
+
+	/**
+	 * Setter of the property <tt>test</tt>
+	 * @param test  The test to set.
+	 * @uml.property  name="test"
+	 */
+	public void setTest(float test) {
+		this.test = test;
 	}
 	
 }

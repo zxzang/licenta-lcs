@@ -13,7 +13,7 @@ import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 /**
- * A gui for the {@link Environment} type.
+ * A gui for the  {@link Environment}  type.
  */
 public class GraphFrame extends JFrame {
 	/**
@@ -23,7 +23,9 @@ public class GraphFrame extends JFrame {
 	private static final long serialVersionUID = 4323232456487666646L;
 	
 	/**
-	 * The {@link Environment} to be displayed.
+	 * The     {@link Environment}     to be displayed.
+	 * @uml.property  name="env"
+	 * @uml.associationEnd  
 	 */
 	private Environment env;
 	
