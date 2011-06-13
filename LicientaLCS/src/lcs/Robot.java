@@ -77,12 +77,10 @@ public class Robot extends Thread {
 	 * Basic constructor
 	 * @param robotNum - robot number
 	 * @param type - type of robot
-	 * @param nSteps - number of steps to backtrack.
 	 */
-	public Robot(int robotNum, int type, int nSteps) {
+	public Robot(int robotNum, int type) {
 		robotId = robotNum;
 		this.type = type;
-		noStepsBack = nSteps;
 		lastSteps = new LinkedList<PositionNRoutes>();
 		Robot.noRobots++;
 		this.foundPath = false;
@@ -116,6 +114,14 @@ public class Robot extends Thread {
 	 */
 	public void setStartPosition(Position start) {
 		current = start;
+	}
+	
+	/**
+	 * Sets the number steps to retreat.
+	 * @param nSteps - number of steps to backtrack.
+	 */
+	protected void setNumberStepsBack(int steps) {
+		this.noStepsBack = steps;
 	}
 	
 	@Override

@@ -20,25 +20,12 @@ import edu.uci.ics.jung.io.graphml.GraphMetadata.EdgeDefault;
  */
 public class GraphTransformer implements
 		Transformer<GraphMetadata, Graph<Position, Edge>> {
-
-	private static final String StepsBack = "noStepsBack";
 	
 	Environment env;
 	
 	@Override
 	public final Graph<Position, Edge> transform(
 			final GraphMetadata metadata) {
-		
-		String stepsBack;
-		stepsBack = metadata.getProperty(StepsBack);
-		
-		if (stepsBack != null) {
-			int steps;
-			try {
-				steps = Integer.parseInt(stepsBack);
-				env.stepsBack = steps;
-			} catch (NumberFormatException e) {}
-		}
 		
 		if (metadata.getEdgeDefault().equals(EdgeDefault.DIRECTED)) {
 			return new DirectedSparseGraph<Position, Edge>();
