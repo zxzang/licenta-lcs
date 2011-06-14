@@ -47,4 +47,11 @@ public class PositionPair {
 		return reward;
 	}
 	
+	/**
+	 * Creates a string representation of the class.
+	 */
+	public String toString() {
+		return "(" + first + "," + second + ")";
+	}
+	
 }
