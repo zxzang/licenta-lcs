@@ -284,7 +284,6 @@ public class Environment {
 		explore(targetPosition, order);
 		int i = 0;
 		for (Position p : order) {
-			//System.out.println(p + " " + i);
 			p.setTopologicPostion(i);
 			i++;
 		}
@@ -391,13 +390,36 @@ public class Environment {
 	 */
 	public final Vector<Position> getAdjacent(final Robot robot) {
 		Position robPos = robot.getCurrentPosition();
-		LinkedList<Edge> outEdges = new LinkedList<Edge>(network.getOutEdges(robPos));
-		/*Vector<Position> ret =
-			new Vector<Position>(network.getNeighbors(robPos));*/
-		Vector<Position> ret = new Vector<Position>(outEdges.size());
+		Vector<Position> ret =
+			new Vector<Position>(network.getNeighbors(robPos));
+		return ret;
+	}
+	
+	/**
+	 * Gets the neighbors and the immediate neighbors of those.
+	 * @param robot - the robot to query.
+	 * @return - a vector of PositionPiar.
+	 */
+	public final Vector<PositionPair> getAdjacentPairs(final Robot robot) {
+		return getAdjacentPairs(robot.getCurrentPosition());
+	}
+	
+	/**
+	 * Gets the neighbors and the immediate neighbors of those.
+	 * @param current - the position to query.
+	 * @return - a vector of PositionPiar.
+	 */
+	public final Vector<PositionPair> getAdjacentPairs(final Position current) {
+		Collection<Position> neigh = network.getNeighbors(current);
+		Vector<PositionPair> ret = new Vector<PositionPair>(neigh.size());
 		
-		for (Edge e : outEdges) {
-			ret.add(network.getOpposite(robPos, e));
+		for (Position pos : neigh) {
+			Collection<Position> newNeigh = network.getNeighbors(pos);
+			for (Position newPos : newNeigh) {
+				if (newPos == current)
+					continue;
+				ret.add(new PositionPair(pos, newPos));
+			}
 		}
 		
 		return ret;
