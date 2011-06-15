@@ -72,6 +72,8 @@ public class Environment {
 	 */
 	static Barrier robotBar;
 	
+	int robotType = Robot.BESTAVAILABLE;
+	
 	/* Debug */
     JFrame rewardFrame;
     RewardPanel rewardPan;
@@ -147,7 +149,7 @@ public class Environment {
 	 * @param percentBestPos - the percentage of robots that will act
 	 * 		on the bestPosition behavior
 	 */
-	public void addAgents(double percentBestPos) {
+	public void addAgents() {
 		activeAgents = 0;
 		Collection<Position> verts = network.getVertices();
 		this.agents = new Vector<Robot>();
@@ -161,13 +163,7 @@ public class Environment {
 			/* for each stored robot name */
 			for (String name : p.robotNames) {
 				Robot r;
-				/*XXX asta nu cumva va adauga acelasi tip?
-                 * p.robotNames.size != tot numarul de roboti (= n final)
-                 */
-				if (activeAgents >= percentBestPos * p.robotNames.size())
-					r = new Robot(activeAgents, Robot.BESTAVAILABLE);
-				else 
-					r = new Robot(activeAgents, Robot.BESTPOSITION);
+				r = new Robot(activeAgents, robotType);
 				r.setName(name);
 				r.setCurrentGoal(this.targetPosition);
 				r.setStartPosition(p);
@@ -478,6 +474,14 @@ public class Environment {
 		res -= 2 * nVerts;
 		
 		return res;		
+	}
+	
+	public void setRobotTypePosition() {
+		robotType = Robot.BESTPOSITION;
+	}
+	
+	public void setRobotTypeAvailable() {
+		robotType = Robot.BESTAVAILABLE;
 	}
 
 }
