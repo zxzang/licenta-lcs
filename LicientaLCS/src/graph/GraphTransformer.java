@@ -21,11 +21,23 @@ import edu.uci.ics.jung.io.graphml.GraphMetadata.EdgeDefault;
 public class GraphTransformer implements
 		Transformer<GraphMetadata, Graph<Position, Edge>> {
 	
+	private static final String robotType = "robotType";
+	
 	Environment env;
 	
 	@Override
 	public final Graph<Position, Edge> transform(
 			final GraphMetadata metadata) {
+		String type;
+		type = metadata.getProperty(robotType);
+		
+		if (type != null) {
+			if (type.equals("Available")){
+				env.setRobotTypeAvailable();
+			} else if (type.equals("Position")) {
+				env.setRobotTypePosition();
+			}
+		}
 		
 		if (metadata.getEdgeDefault().equals(EdgeDefault.DIRECTED)) {
 			return new DirectedSparseGraph<Position, Edge>();
