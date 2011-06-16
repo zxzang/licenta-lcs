@@ -201,12 +201,9 @@ public class Environment {
 		
 		if (nAgents == 0)
 		        return;
-		
-		if (nAgents == 1) {
-		        reward = nVerts;
-		} else {
-		        reward = nVerts;
-		}
+		// Hard to believe we will have so many vertices so as maxReward to go over
+		//	maxInt.
+		reward = nVerts;
 		logger.debug("Position reward set to " + reward);
 		
 		Position.setMinReward(reward);
