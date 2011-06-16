@@ -6,14 +6,11 @@ import java.util.Vector;
 
 import org.apache.log4j.*;
 
-
 /**
- * 
- * @author Dascalu Sorin
- *
+ * An abstraction for an agent traversing {@link Environment} .
  */
 public class Robot extends Thread {
-
+	
 	/**
 	 * Class that associates a certain position with the number
 	 * of available routes that go out of it.
@@ -26,7 +23,7 @@ public class Robot extends Thread {
 			nR = y;
 		}
 	}
-
+	
 	/**
 	 * Class that associates a certain position with the its reward.
 	 */
@@ -168,19 +165,15 @@ public class Robot extends Thread {
 		Position nextMove = null;
 		Vector<Position> adjacent;
 		String adjacentStr;
-		StringBuffer sbuff;
+		StringBuffer sbuff = new StringBuffer();
 		
 		while (current != target) {
 			logger.debug("My turn - i am on " + current);
+			
 			adjacent = env.getAdjacent(this);
-
-			sbuff = new StringBuffer();
-			for(Position x : adjacent)
-				sbuff.append(x + " ");
-
 			removeDeadEnds(adjacent);
 			
-			adjacentStr = "";
+			sbuff.delete(0, sbuff.length());
 			for(Position x : adjacent)
 				sbuff.append(x + " ");
 			adjacentStr = sbuff.toString();
@@ -276,10 +269,7 @@ public class Robot extends Thread {
 	 * @return null or Position in which to move
 	 */
 	Position getNextMoveAbsolute(Vector<Position> available) {
-		//logger.debug("eu " + getName() + " cer mutare absolute best");
 		Position bestPos = null;
-		// XXX what?! MIN_VALUE e deja negativ, you sure?
-		// --- fixed. My bad. Oddly enough didn't affect results
 		int bestReward = Integer.MIN_VALUE;
 		int tempReward;
 		
@@ -310,7 +300,6 @@ public class Robot extends Thread {
 	 * @return null or Position in which to move
 	 */
 	Position getNextMoveAvailable(Vector<Position> available) {
-		//System.out.println("eu " + getName() + " cer mutare best available");
 		int tempReward;
 		PositionNReward queueElement;
 		Position nextMove;
@@ -319,7 +308,7 @@ public class Robot extends Thread {
 		
 		/**
 		 * I will the try the first best move available.
-		 * If all my neighbours are occupied I will hold my ground.
+		 * If all my neighbors are occupied I will hold my ground.
 		 */
 		
 		for (Position i: available) {
