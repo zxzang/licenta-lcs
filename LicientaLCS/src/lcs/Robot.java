@@ -257,11 +257,12 @@ public class Robot extends Thread {
 		}
 	}
 	
-	/**
-	 * 
-	 * If possible it reserves the Position to move into
-	 * @param available
-	 * @return
+	/** 
+	 * If possible it reserves the best Position to move into
+	 * 	and returns the position.
+	 * If not it returns null.
+	 * @param available - available Positions to move into
+	 * @return null or Position in which to move
 	 */
 	Position getNextMoveAbsolute(Vector<Position> available) {
 		//logger.debug("eu " + getName() + " cer mutare absolute best");
@@ -290,6 +291,13 @@ public class Robot extends Thread {
 			return null;
 	}
 	
+	/** 
+	 * If possible it reserves the next best Position to move into
+	 * 	and returns the position.
+	 * If all Positions are taken it returns null.
+	 * @param available - available Positions to move into
+	 * @return null or Position in which to move
+	 */
 	Position getNextMoveAvailable(Vector<Position> available) {
 		//System.out.println("eu " + getName() + " cer mutare best available");
 		int tempReward;
@@ -323,6 +331,11 @@ public class Robot extends Thread {
 		return null;
 	}
 	
+	/**
+	 * Removes Positions that have proven to be dead ends or part of dead ends
+	 * 	from a vector of Positions.
+	 * @param adjacent - vector of adjacent Positions of a certain Position
+	 */
 	void removeDeadEnds(Vector<Position> adjacent) {
 		Vector<Position> toRemove = new Vector<Position>();
 		for(Position x:adjacent)
@@ -332,6 +345,10 @@ public class Robot extends Thread {
 			adjacent.remove(x);
 	}
 	
+	/**
+	 * Goes back a number of memorized steps and rewards negatively
+	 * 	all the the Positions on that path.
+	 */
 	void goBackNMark() {
 		// should I block the current node ?
 		boolean toBlock = true;
