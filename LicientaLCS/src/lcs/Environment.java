@@ -27,8 +27,6 @@ import graph.VertexTransformer;
 
 /**
  * Used to synchronize the agents and give them the input they need.
- * @author Iustin Dumitrescu
- *
  */
 public class Environment {
 
@@ -75,11 +73,11 @@ public class Environment {
 	int robotType = Robot.BESTAVAILABLE;
 	
 	/* Debug */
-    JFrame rewardFrame;
-    RewardPanel rewardPan;
-    Scanner sc = new Scanner(System.in);
-    /* ----- */
-    
+	JFrame rewardFrame;
+	RewardPanel rewardPan;
+	Scanner sc = new Scanner(System.in);
+	/* ----- */
+	
 	/**
 	 * Basic constructor.
 	 * @param input - the filename from which the graph is to be read.
@@ -103,8 +101,6 @@ public class Environment {
 		
 		this.getTarget();
 		
-		//this.sortTop();
-		//this.bfs();
 		this.dfs();
 		
 		logger.info("Target position is " + targetPosition + 
@@ -125,11 +121,11 @@ public class Environment {
 			} catch (InterruptedException ex){}
 		}
 		
-		/*rewardPan = new RewardPanel(this);
+		rewardPan = new RewardPanel(this);
 		rewardFrame = new JFrame();
-		rewardFrame.setSize(400, 200);
+		rewardFrame.setSize(400, 300);
 		rewardFrame.add(rewardPan);
-		rewardFrame.setVisible(true);*/
+		rewardFrame.setVisible(true);
 	}
 	
 	/**
@@ -186,6 +182,7 @@ public class Environment {
 	 */
 	private void setStepsBack() {
 		int steps = network.getVertexCount() / activeAgents;
+		logger.info("Number of steps back " + steps);
 		for (Robot agent : agents) {
 			agent.setNumberStepsBack(steps);
 		}
@@ -201,6 +198,7 @@ public class Environment {
 		
 		if (nAgents == 0)
 		        return;
+		
 		// Hard to believe we will have so many vertices so as maxReward to go over
 		//	maxInt.
 		reward = nVerts;
@@ -210,8 +208,6 @@ public class Environment {
 		targetPosition.givePositiveFeedback(reward + reward * 2 * nVerts);
 		
 		logger.debug("Target Position reward set to " + (reward + reward * 2 * nVerts));
-		
-		//while(!sc.nextLine().equals(""));
 	}
 	
 	/**
@@ -254,28 +250,10 @@ public class Environment {
 		this.network = graphReader.readGraph();
 	}
 	
-	private void bfs() {
-		LinkedList<Position> toSearch = new LinkedList<Position>();
-		
-		targetPosition.setTopologicPostion(0);
-		targetPosition.userVar = 1;
-		toSearch.add(targetPosition);
-		
-		while (toSearch.isEmpty() == false) {
-			Position p = toSearch.pop();
-			Collection<Position> neigh = network.getNeighbors(p);
-			
-			for (Position n : neigh) {
-				if (n.userVar == 0) {
-					n.userVar = 1;
-					n.setTopologicPostion(p.getTopologicPostion()+1);
-					toSearch.add(n);
-				}
-			}
-		}
-		
-	}
-	
+	/**
+	 * Traverses the graph with a dfs algorithm and assigns a
+	 * sorting order. Starts from the targetPosition.
+	 */
 	private void dfs() {
 		LinkedList<Position> order = new LinkedList<Position>();
 		explore(targetPosition, order);
@@ -287,6 +265,11 @@ public class Environment {
 		
 	}
 	
+	/**
+	 * Used by the dfs algorithm to explore a given node.
+	 * @param vert - the node to be explored.
+	 * @param queue - the queue containing the explored nodes.
+	 */
 	private void explore(Position vert, LinkedList<Position> queue) {
 		Collection<Position> neigh = network.getNeighbors(vert);
 		vert.userVar = 1;
@@ -296,67 +279,6 @@ public class Environment {
 			}
 		}
 		queue.addFirst(vert);
-	}
-	
-	/**
-	 * Used to topologically sort the graph.
-	 */
-	private void sortTop() {
-		
-		// --- Replaced this BFS - might suit our needs better
-		
-		// TODO remove stupid comments after testing code
-		// L - Empty list that will contain the sorted nodes
-		LinkedList<Position> l = new LinkedList<Position>();
-		
-		// S - Set of all nodes with no incoming edges
-		ArrayList<Position> c = new ArrayList<Position>(
-				network.getVertices());
-		
-		Position pos = null;
-		for (Iterator<Position> p = c.iterator(); p.hasNext();) {
-			pos = p.next();			
-			p.remove();
-		}
-		c.add(pos);
-		
-		for (Iterator<Position> p = c.iterator(); p.hasNext();) {
-			pos = p.next();
-			this.visit(pos, l);
-		}
-		
-		int i = 0;
-		for (Iterator<Position> iter = l.iterator(); iter.hasNext(); i++) {
-			Position p = iter.next();
-			p.setTopologicPostion(i);
-		}
-
-		
-	}
-	
-	/**
-	 * Part of the topological sort algorithm.
-	 * Recursive function that marks nodes.
-	 * @param n - the visited node.
-	 * @param l - the list of visited nodes.
-	 */
-	private void visit(final Position n, final LinkedList<Position> l) {
-		// if n has not been visited yet then
-		if (n.userVar == 0) {
-			// mark n as visited
-			n.userVar = 1;
-			
-			Collection<Position> succ = network.getSuccessors(n);
-			//for each node m with an edge from n to m do
-			for (Iterator<Position> itSucc = succ.iterator();
-					itSucc.hasNext();) {
-				Position m = itSucc.next();
-				// visit(m)
-				visit(m, l);
-			}
-			//add n to L
-			l.add(n);
-		}
 	}
 	
 	/**
@@ -450,25 +372,31 @@ public class Environment {
 		logger.debug(r.getName() + " got to " + dst + 
 				"[" + dst.getTopologicPostion() + "]");
 		
-		//rewardPan.update();
+		rewardPan.update();
 		
-		//while(!sc.nextLine().equals(""));
+		while(!sc.nextLine().equals(""));
 		
 		return 0;
 	}
 	
+	/**
+	 * Informs the environment that the robot has reached the final position
+	 * and therefore should be considered removed from the graph.
+	 * @param robotId - the robot to be removed.
+	 */
 	public final void removeFromMap(int robotId) {
 		targetPosition.sem.release();
 		Robot r = agents.get(robotId);
 		logger.debug(r.getName() + " ejected from map");
-		//robotPos.set(robotId, -1);
+		
 		activeAgents--;
+		
 		if (activeAgents == 0) {
 			logger.info("All agents ejected from map.");
 		}
 	}
 	
-	public int getReducedReward(Position target){
+	public int getReducedReward(Position target) {
 		int res = target.pheromone;
 		int nVerts = network.getVertexCount();
 		
@@ -477,10 +405,16 @@ public class Environment {
 		return res;		
 	}
 	
+	/**
+	 * Sets the robots of the environment to BESTPOSITION.
+	 */
 	public void setRobotTypePosition() {
 		robotType = Robot.BESTPOSITION;
 	}
-	
+
+	/**
+	 * Sets the robots of the environment to BESTAVAILABLE.
+	 */
 	public void setRobotTypeAvailable() {
 		robotType = Robot.BESTAVAILABLE;
 	}
