@@ -1,5 +1,8 @@
 package lcsgui;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -13,7 +16,7 @@ public class RewardPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 8213435715847065200L;
 	
-	class Field extends JTextField {
+	class Field extends JLabel {
 		/**
 		 * Eclipse again.
 		 */
@@ -34,6 +37,8 @@ public class RewardPanel extends JPanel {
 	
 	public RewardPanel(Environment env) {
 		super();
+		
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		info = new Field[env.getGraph().getVertexCount()];
 		
