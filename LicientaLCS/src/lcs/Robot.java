@@ -225,6 +225,7 @@ public class Robot extends Thread {
 					}
 					
 					env.makeAction(robotId, nextMove);
+					updateChosenRule();
 					
 					current = nextMove;
 					
@@ -240,6 +241,13 @@ public class Robot extends Thread {
 		logger.info("Landed on the promised land!");
 		env.removeFromMap(robotId);
 		bar.decThreadNum(); //	We must not wait for this robot anymore
+	}
+	
+	/**
+	 * Function stub; will only be used on the 2nd level robots
+	 */
+	public void updateChosenRule(){
+		
 	}
 	
 	/**
