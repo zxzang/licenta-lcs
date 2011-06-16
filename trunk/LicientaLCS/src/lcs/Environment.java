@@ -298,17 +298,16 @@ public class Environment {
 	 * @return A vector of all available positions.
 	 */
 	public final Vector<Position> getAdjacent(final int robot) {
-		return this.getAdjacent(agents.get(robot));
+		return this.getAdjacent(agents.get(robot).getCurrentPosition());
 	}
 
 	/**
-	 * Gets all adjacent positions for the specified agent.
+	 * Gets all adjacent positions for the specified position.
 	 * This includes anything but obstacles.
-	 * @param robot - the agent to be used.
+	 * @param position
 	 * @return A vector of all available positions.
 	 */
-	public final Vector<Position> getAdjacent(final Robot robot) {
-		Position robPos = robot.getCurrentPosition();
+	public final Vector<Position> getAdjacent(final Position robPos) {		
 		Vector<Position> ret =
 			new Vector<Position>(network.getNeighbors(robPos));
 		return ret;
@@ -417,6 +416,38 @@ public class Environment {
 	 */
 	public void setRobotTypeAvailable() {
 		robotType = Robot.BESTAVAILABLE;
+	}
+	
+	// TODO am folosit mostly Position.pheromone... uitasem de functia getFeedback
+	//		de pus pheromone private si inlocuit peste tot cu getFeedback.
+	//		Voi folosi de acum getFeedback()
+	
+	/**
+	 * Updates the chosen rule's fitness
+	 * @param choseRule - the rule after which the agent will move
+	 */
+	public void giveReward(LCSRule chosenRule){
+		int maxReward = Integer.MIN_VALUE;
+		Vector<Position> ruleAdjancies = getAdjacent(chosenRule.getNext());
+		Position auxiliary;
+		
+		for(Position x:ruleAdjancies){
+			int distanceFromTarget = Math.abs(x.getTopologicPostion() - 
+					targetPosition.getTopologicPostion());
+			if (x.getFeedback() - distanceFromTarget > maxReward)
+				maxReward = x.getFeedback() - distanceFromTarget;
+		}
+		
+		auxiliary = chosenRule.getCurrent();
+		int distanceFromTarget = 
+			Math.abs(auxiliary.getTopologicPostion() - 
+				targetPosition.getTopologicPostion());
+		if (auxiliary.getFeedback() - distanceFromTarget > maxReward)
+			maxReward = auxiliary.getFeedback() - distanceFromTarget;
+		
+		if (maxReward > chosenRule.getFitness())
+			chosenRule.setFitness(maxReward);
+		
 	}
 
 }
