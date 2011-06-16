@@ -132,31 +132,29 @@ public class Robot extends Thread {
 		Position nextMove = null;
 		Vector<Position> adjacent;
 		String adjacentStr;
+		StringBuffer sbuff;
 		
 		while (current != target) {
-			logger.debug("My turn - i am on " + current);			
+			logger.debug("My turn - i am on " + current);
 			adjacent = env.getAdjacent(this);
 
-			adjacentStr = "";
-			for(Position x:adjacent)
-				adjacentStr += x + " ";
-			//logger.debug("All adjacents: "+adjacentStr);
+			sbuff = new StringBuffer();
+			for(Position x : adjacent)
+				sbuff.append(x + " ");
 
 			removeDeadEnds(adjacent);
 			
 			adjacentStr = "";
-			for(Position x:adjacent)
-				adjacentStr += x + " ";
-			//logger.debug("Goal " + target + "[" +
-			//		target.getTopologicPostion() + "]");
-			logger.debug("Valid adjacents: "+adjacentStr);
+			for(Position x : adjacent)
+				sbuff.append(x + " ");
+			adjacentStr = sbuff.toString();
+			logger.debug("Valid adjacents: " + adjacentStr);
 
 			if (adjacent.size() == 1) { // we're stuck
 				logger.debug(getName() + " is on his way backwards");
 				goBackNMark();
 			} else {
 				nextMove = null;
-				
 				
 				//	I'll wait to move till I get a free position in which I can move
 				nextMove = getNextMove(adjacent);
@@ -176,9 +174,9 @@ public class Robot extends Thread {
 				 * As vrea chiar sa fac un package pt robot + rules. This isnt mandatory.
 				 */
 				
-				if (nextMove == null){
+				if (nextMove == null) {
 					logger.debug(this.getName() + " held his ground");
-					try{
+					try {
 						bar.enterBarrier();
 					} catch (InterruptedException ex) {
 						logger.error(this.getName() + "could not enter the barrier");
@@ -189,29 +187,27 @@ public class Robot extends Thread {
 					 * 	lastSteps with half of my reward.
 					 */
 					int reward = env.getReducedReward(nextMove);
-					if (reward > 0 && !foundPath){
-						for(PositionNRoutes x:lastSteps)
-							x.pos.givePositiveFeedback(reward);
-						foundPath = true;
-					}
-
 					
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
 						lastSteps.removeFirst();
+					
+					if (reward > 0 && !foundPath) {
+						for(PositionNRoutes x : lastSteps)
+							x.pos.givePositiveFeedback(reward);
+						foundPath = true;
+					}
+					
 					env.makeAction(robotId, nextMove);
 					
 					current = nextMove;
 					
-						
-					
-					try{
+					try {
 						bar.enterBarrier();
 					} catch (InterruptedException ex) {
 						logger.error(this.getName() + "could not enter the barrier");
 					}
-
-				}							
+				}
 			}
 		}
 		
@@ -258,7 +254,7 @@ public class Robot extends Thread {
 				bestPos = i;
 			}
 		}
-			
+		
 		if (bestPos != null && bestPos.sem.tryAcquire())
 			return bestPos;
 		else
@@ -315,7 +311,7 @@ public class Robot extends Thread {
 		// the next position in my road back
 		Position nextMove;
 		// the no. of available routes at me current position
-		int noARoutes;		
+		int noARoutes;
 		
 		while (!lastSteps.isEmpty()) {
 			logger.debug(getName() + " is moving backward");
@@ -323,47 +319,42 @@ public class Robot extends Thread {
 			aux = lastSteps.removeLast();
 			nextMove = aux.pos;
 
-			/*
-			 *  Part where I check out how to block certain routes
-			 */
+			/* Part where I check out how to block certain routes */
 			if (toBlock) {
 				nextMove.blockRoute(current);
 				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
-				current.blockRoute(nextMove);				
+				current.blockRoute(nextMove);
 				aux.nR--;
 			}
 			
-			//	--- Give negative feedback now is double off positive feedback			
 			current.giveNegativeFeedback();
-			
 			
 			noARoutes = aux.nR;
 			
 			// there is one way .. the way back. Block the position I say
-			if (noARoutes <= 1 && toBlock)
+			if (noARoutes <= 1 && toBlock) {
 				toBlock = true;			
-			else // blocked a route but others are available .. position stands
+			} else {// blocked a route but others are available .. position stands
 				toBlock = false;
+			}
 			
-			/*
-			 * Actual movement backwards
-			 */
-			while (!nextMove.sem.tryAcquire()){
-				try{
+			/* Actual movement backwards */
+			while (!nextMove.sem.tryAcquire()) {
+				try {
 					logger.debug(getName() + " held his ground " + current +
 							"\n\twaiting for a previous " + nextMove +
 							" to be free");
 					bar.enterBarrier();
-				} catch (InterruptedException ex){
+				} catch (InterruptedException ex) {
 					logger.error(getName() + "could not enter barrier");
 				}
 			}
 
 			env.makeAction(robotId, nextMove);
 			current = nextMove;
-			try{
+			try {
 				bar.enterBarrier();
-			} catch (InterruptedException ex){
+			} catch (InterruptedException ex) {
 				logger.error(getName() + "could not enter barrier");
 			}
 		}
