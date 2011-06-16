@@ -49,14 +49,50 @@ public class Robot extends Thread {
 		}
 	}
 	
+	/**
+	 * Current position of the robot
+	 */
 	Position current;
+	
+	/**
+	 * Target position of robot
+	 */
 	Position target;
+	
+	/**
+	 * Environment where the robot moves
+	 */
 	Environment env;
+	
+	/**
+	 * Last steps taken by the robot
+	 */
 	LinkedList<PositionNRoutes> lastSteps;
+	
+	/**
+	 * Number of steps the robot remembers.
+	 */
 	int noStepsBack;
+	
+	/**
+	 * Robot Identification number
+	 */
 	int robotId;	
+	
+	/**
+	 * Class logger
+	 */
 	private static Logger logger = Logger.getLogger("Robot");
+	
+	/**
+	 * Common barrier used by all agents
+	 */
 	private static Barrier bar = Environment.robotBar;
+	
+	/**
+	 * Flag that specifies if this robot has found a path to the 
+	 * 	goal.
+	 */
 	private boolean foundPath;
 	
 	/**
@@ -65,7 +101,7 @@ public class Robot extends Thread {
 	static int noRobots = 0;
 	
 	/**
-	 * 	Robot type
+	 * 	Robot types
 	 * 		1  -  Only wants to move on the best position
 	 * 		2  -  Will move on the best position available
 	 */
@@ -158,21 +194,7 @@ public class Robot extends Thread {
 				
 				//	I'll wait to move till I get a free position in which I can move
 				nextMove = getNextMove(adjacent);
-				
-				/**
-				 * XXX This is error prone.
-				 * Situatie: [A][B][0] un rand numerotat 1-3.
-				 * A care se afla pe pozitia 1 ar vrea sa treaca pe poz 2.
-				 * B vrea pe pozitia 3 care e libera.
-				 * initial A o sa tryAquire pe 2, o sa fail + o sa piarda o tura.
-				 * B o sa treaca pe 3, astfel 2 va fi liber.
-				 * Tot consider ca ar trebui sa se faca o buna parte in env
-				 * astfel robotii sa mearga la aceasi viteza.
-				 * Daca nu vrei sa mearga la aceasi viteza si sa lasam la 
-				 * mana schedelurului thats dandy.
-				 * give opinion.
-				 * As vrea chiar sa fac un package pt robot + rules. This isnt mandatory.
-				 */
+
 				
 				if (nextMove == null) {
 					logger.debug(this.getName() + " held his ground");
@@ -235,11 +257,18 @@ public class Robot extends Thread {
 		}
 	}
 	
+	/**
+	 * 
+	 * If possible it reserves the Position to move into
+	 * @param available
+	 * @return
+	 */
 	Position getNextMoveAbsolute(Vector<Position> available) {
 		//logger.debug("eu " + getName() + " cer mutare absolute best");
 		Position bestPos = null;
 		// XXX what?! MIN_VALUE e deja negativ, you sure?
-		int bestReward = -Integer.MIN_VALUE;
+		// --- fixed. My bad. Oddly enough didn't affect results
+		int bestReward = Integer.MIN_VALUE;
 		int tempReward;
 		
 		/**
