@@ -177,7 +177,7 @@ public class Environment {
 		Environment.robotBar.setNumThreads(activeAgents);
 		this.setRobotPositions();
 
-		//this.setPositionReward();
+		this.setPositionReward();
 		this.setStepsBack();
 	}
 	
@@ -205,12 +205,16 @@ public class Environment {
 		if (nAgents == 1) {
 		        reward = nVerts;
 		} else {
-		        reward = nVerts / (nAgents - 1);
+		        reward = nVerts;
 		}
 		logger.debug("Position reward set to " + reward);
 		
 		Position.setMinReward(reward);
 		targetPosition.givePositiveFeedback(reward + reward * 2 * nVerts);
+		
+		logger.debug("Target Position reward set to " + (reward + reward * 2 * nVerts));
+		
+		//while(!sc.nextLine().equals(""));
 	}
 	
 	/**

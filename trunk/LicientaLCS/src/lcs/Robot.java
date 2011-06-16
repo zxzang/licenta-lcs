@@ -198,6 +198,9 @@ public class Robot extends Thread {
 				
 				if (nextMove == null) {
 					logger.debug(this.getName() + " held his ground");
+					
+					logger.debug("My current position has a current reward of " + 
+							current.pheromone);
 					try {
 						bar.enterBarrier();
 					} catch (InterruptedException ex) {
@@ -210,13 +213,21 @@ public class Robot extends Thread {
 					 */
 					int reward = env.getReducedReward(nextMove);
 					
+					logger.debug("My current position has a current reward of " + 
+							nextMove.pheromone);
+					
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
 						lastSteps.removeFirst();
 					
 					if (reward > 0 && !foundPath) {
 						for(PositionNRoutes x : lastSteps)
-							x.pos.givePositiveFeedback(reward);
+							//	Will update pheromone only if I am giving a bigger
+							//		reward than the one it had before.
+							//	Implemented a safeguard procedure in the givePositionFeedback
+							//		function so as not not to be greater the reward though.
+							if (x.pos.pheromone < reward)
+								x.pos.givePositiveFeedback(reward);
 						foundPath = true;
 					}
 					

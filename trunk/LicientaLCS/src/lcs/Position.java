@@ -163,6 +163,11 @@ public class Position {
 		else {
 			this.pheromone += minReward;
 		}
+		
+		//	Don't want to go over the given reward
+		if (this.pheromone > reward){
+			this.pheromone = reward;
+		}
 	}
 
 	/**
