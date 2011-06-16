@@ -91,9 +91,6 @@ public class LCSRule {
 		return res;
 	}
 	
-	public static void updateRule(LCSRule rule, int updatedFitness){
-		
-	}
 	
 	
 }

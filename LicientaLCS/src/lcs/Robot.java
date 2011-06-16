@@ -170,7 +170,7 @@ public class Robot extends Thread {
 		while (current != target) {
 			logger.debug("My turn - i am on " + current);
 			
-			adjacent = env.getAdjacent(this);
+			adjacent = env.getAdjacent(current);
 			removeDeadEnds(adjacent);
 			
 			sbuff.delete(0, sbuff.length());
