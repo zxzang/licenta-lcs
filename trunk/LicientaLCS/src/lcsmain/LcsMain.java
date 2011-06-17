@@ -43,7 +43,7 @@ public class LcsMain {
 		}
 		
 		env = new Environment(args[0]);
-		gFrame = new GraphFrame(env);
+		//gFrame = new GraphFrame(env);
 		env.addAgents();
 		env.startAgents();
 		/* TODO poate ar fi bine sa separam robotii de topologie 

@@ -15,7 +15,7 @@
 	<key id="robot3" for="node" attr.name="robot" attr.type="string"/>
 	
 	<graph id="G" edgedefault="undirected">
-		<data key="robotType">Position</data>
+		<data key="robotType">Foresee</data>
 	
 		<!-- nodes -->
 		<node id="c0">
