@@ -159,7 +159,11 @@ public class Environment {
 			/* for each stored robot name */
 			for (String name : p.robotNames) {
 				Robot r;
-				r = new Robot(activeAgents, robotType);
+				if (robotType == Robot.FORESEE) {
+					r = new RobotL2(activeAgents);
+				} else {
+					r = new Robot(activeAgents, robotType);
+				}
 				r.setName(name);
 				r.setCurrentGoal(this.targetPosition);
 				r.setStartPosition(p);
@@ -206,6 +210,7 @@ public class Environment {
 		
 		Position.setMinReward(reward);
 		targetPosition.givePositiveFeedback(reward + reward * 2 * nVerts);
+		rewardPan.update();
 		
 		logger.debug("Target Position reward set to " + (reward + reward * 2 * nVerts));
 	}
@@ -314,36 +319,6 @@ public class Environment {
 	}
 	
 	/**
-	 * Gets the neighbors and the immediate neighbors of those.
-	 * @param robot - the robot to query.
-	 * @return - a vector of PositionPiar.
-	 */
-	public final Vector<PositionPair> getAdjacentPairs(final Robot robot) {
-		return getAdjacentPairs(robot.getCurrentPosition());
-	}
-	
-	/**
-	 * Gets the neighbors and the immediate neighbors of those.
-	 * @param current - the position to query.
-	 * @return - a vector of PositionPiar.
-	 */
-	public final Vector<PositionPair> getAdjacentPairs(final Position current) {
-		Collection<Position> neigh = network.getNeighbors(current);
-		Vector<PositionPair> ret = new Vector<PositionPair>(neigh.size());
-		
-		for (Position pos : neigh) {
-			Collection<Position> newNeigh = network.getNeighbors(pos);
-			for (Position newPos : newNeigh) {
-				if (newPos == current)
-					continue;
-				ret.add(new PositionPair(pos, newPos));
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
 	 * Gets the graph stored in the environment.
 	 * @return the internal graph.
 	 */
@@ -418,6 +393,10 @@ public class Environment {
 		robotType = Robot.BESTAVAILABLE;
 	}
 	
+	public void setRobotTypeForesee() {
+		robotType = Robot.FORESEE;
+	}
+	
 	// TODO am folosit mostly Position.pheromone... uitasem de functia getFeedback
 	//		de pus pheromone private si inlocuit peste tot cu getFeedback.
 	//		Voi folosi de acum getFeedback()
@@ -447,7 +426,6 @@ public class Environment {
 		
 		if (maxReward > chosenRule.getFitness())
 			chosenRule.setFitness(maxReward);
-		
 	}
-
+	
 }

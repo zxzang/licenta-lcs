@@ -7,7 +7,7 @@ import java.util.Vector;
 import org.apache.log4j.*;
 
 /**
- * An abstraction for an agent traversing {@link Environment} .
+ * An abstraction for an agent traversing {@link Environment}.
  */
 public class Robot extends Thread {
 	
@@ -47,22 +47,22 @@ public class Robot extends Thread {
 	}
 	
 	/**
-	 * Current position of the robot
+	 * Current position of the robot.
 	 */
 	Position current;
 	
 	/**
-	 * Target position of robot
+	 * Target position of robot.
 	 */
 	Position target;
 	
 	/**
-	 * Environment where the robot moves
+	 * Environment where the robot moves.
 	 */
 	Environment env;
 	
 	/**
-	 * Last steps taken by the robot
+	 * Last steps taken by the robot.
 	 */
 	LinkedList<PositionNRoutes> lastSteps;
 	
@@ -72,38 +72,48 @@ public class Robot extends Thread {
 	int noStepsBack;
 	
 	/**
-	 * Robot Identification number
+	 * Robot Identification number.
 	 */
 	int robotId;	
 	
 	/**
-	 * Class logger
+	 * Class logger.
 	 */
 	private static Logger logger = Logger.getLogger("Robot");
 	
 	/**
-	 * Common barrier used by all agents
+	 * Common barrier used by all agents.
 	 */
 	private static Barrier bar = Environment.robotBar;
 	
 	/**
-	 * Flag that specifies if this robot has found a path to the 
-	 * 	goal.
+	 * Flag that specifies if this robot has found a path to the goal.
 	 */
 	private boolean foundPath;
 	
 	/**
-	 * Number of robots instantiated of this class
+	 * Number of robots instantiated of this class.
 	 */
 	static int noRobots = 0;
 	
 	/**
-	 * 	Robot types
-	 * 		1  -  Only wants to move on the best position
-	 * 		2  -  Will move on the best position available
+	 * Only wants to move on the best position.
 	 */
 	public static final int BESTPOSITION = 1;
+	
+	/**
+	 * Will move on the best position available.
+	 */
 	public static final int BESTAVAILABLE = 2;
+	
+	/**
+	 * Robot that will take into account 2 position further.
+	 */
+	public static final int FORESEE = 3;
+	
+	/**
+	 * The type of the robot.
+	 */
 	int type;
 	
 	/**
@@ -255,7 +265,7 @@ public class Robot extends Thread {
 	 * @param available - a vector of potential successors.
 	 * @return The best position to go to.
 	 */
-	Position getNextMove(Vector<Position> available) {
+	protected Position getNextMove(Vector<Position> available) {
 		switch (this.type) {
 		case BESTPOSITION:
 			// Robot care vrea neaparat sa se miste pe cea mai buna pozitie
@@ -276,7 +286,7 @@ public class Robot extends Thread {
 	 * @param available - available Positions to move into
 	 * @return null or Position in which to move
 	 */
-	Position getNextMoveAbsolute(Vector<Position> available) {
+	private Position getNextMoveAbsolute(Vector<Position> available) {
 		Position bestPos = null;
 		int bestReward = Integer.MIN_VALUE;
 		int tempReward;
@@ -307,7 +317,7 @@ public class Robot extends Thread {
 	 * @param available - available Positions to move into
 	 * @return null or Position in which to move
 	 */
-	Position getNextMoveAvailable(Vector<Position> available) {
+	private Position getNextMoveAvailable(Vector<Position> available) {
 		int tempReward;
 		PositionNReward queueElement;
 		Position nextMove;

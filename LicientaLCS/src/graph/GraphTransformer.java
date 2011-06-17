@@ -36,6 +36,8 @@ public class GraphTransformer implements
 				env.setRobotTypeAvailable();
 			} else if (type.equals("Position")) {
 				env.setRobotTypePosition();
+			} else if (type.equals("Foresee")) {
+				env.setRobotTypeForesee();
 			}
 		}
 		

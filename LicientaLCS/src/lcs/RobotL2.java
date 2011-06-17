@@ -14,13 +14,13 @@ public class RobotL2 extends Robot {
 	}
 
 	@Override
-	Position getNextMove(Vector<Position> available) {
+	protected Position getNextMove(Vector<Position> available) {
 		Position res = null;
 		
 		selectedRule = LCSRule.selectRule(ruleSet, current, available);
 		
-		if (selectedRule == null){
-			for(Position x: available){
+		if (selectedRule == null) {
+			for(Position x : available) {
 				int fitness = - Math.abs(x.getTopologicPostion() -
 						current.getTopologicPostion());
 				LCSRule newRule = new LCSRule(current, x, fitness);
