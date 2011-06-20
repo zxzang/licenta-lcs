@@ -28,7 +28,7 @@ public class Position {
 	 *         the first and last node topologically sorted will always be
 	 *         negative hence it might never get chosen
 	 */
-	static int reward;
+	static int minReward;
 	
 	/**
 	 * The blocked routes from this position.
@@ -121,11 +121,11 @@ public class Position {
 	}
 	
 	/**
-	 * Sets the reward given to all the positions.
+	 * Sets the minimum reward given to a the position.
 	 * @param reward - the value to be given.
 	 */
-	public static void setReward(int reward) {
-		Position.reward = reward;
+	public static void setMinReward(int reward) {
+		Position.minReward = reward;
 	}
 	
 	/**
@@ -148,7 +148,7 @@ public class Position {
 	 * Used by the VertexTransformer to add a name to the position.
 	 * @param name - the name of the robot.
 	 */
-	protected void addRobot(String name) {
+	public void addRobot(String name) {
 		if (this.robotNames == null)
 			robotNames = new LinkedList<String>();
 		robotNames.add(name);
@@ -157,17 +157,26 @@ public class Position {
 	/**
 	 * An agent can inform others that this position was beneficial.
 	 */
-	protected final void givePositiveFeedback() {
-		this.pheromone += reward;
+	protected final void givePositiveFeedback(int reward) {
+		if (reward > minReward)
+			this.pheromone += reward;
+		else {
+			this.pheromone += minReward;
+		}
+		
+		//	Don't want to go over the given reward
+		if (this.pheromone > reward){
+			this.pheromone = reward;
+		}
 	}
 
 	/**
 	 * An agent can inform others that this position was harmful.
 	 */
 	protected final void giveNegativeFeedback() {
-		this.pheromone -= reward;
+		this.pheromone -= minReward;
 	}
-
+	
 	/**
 	 * Gives the current feedback of this position.
 	 * @return feedback left by previous agents.

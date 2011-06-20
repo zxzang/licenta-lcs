@@ -1,5 +1,9 @@
-package lcs;
+package graph;
 
+
+import lcs.Edge;
+import lcs.Environment;
+import lcs.Position;
 
 import org.apache.commons.collections15.Transformer;
 
@@ -16,24 +20,25 @@ import edu.uci.ics.jung.io.graphml.GraphMetadata.EdgeDefault;
  */
 public class GraphTransformer implements
 		Transformer<GraphMetadata, Graph<Position, Edge>> {
-
-	private static final String StepsBack = "noStepsBack";
+	
+	private static final String robotType = "robotType";
 	
 	Environment env;
 	
 	@Override
 	public final Graph<Position, Edge> transform(
 			final GraphMetadata metadata) {
+		String type;
+		type = metadata.getProperty(robotType);
 		
-		String stepsBack;
-		stepsBack = metadata.getProperty(StepsBack);
-		
-		if (stepsBack != null) {
-			int steps;
-			try {
-				steps = Integer.parseInt(stepsBack);
-				env.stepsBack = steps;
-			} catch (NumberFormatException e) {}
+		if (type != null) {
+			if (type.equals("Available")){
+				env.setRobotTypeAvailable();
+			} else if (type.equals("Position")) {
+				env.setRobotTypePosition();
+			} else if (type.equals("Foresee")) {
+				env.setRobotTypeForesee();
+			}
 		}
 		
 		if (metadata.getEdgeDefault().equals(EdgeDefault.DIRECTED)) {

@@ -10,9 +10,6 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Vector;
 
-import javax.swing.JFrame;
-
-import lcsgui.RewardPanel;
 import lcsmain.LcsMain;
 
 import org.apache.log4j.Logger;
@@ -21,12 +18,12 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.io.GraphIOException;
 import edu.uci.ics.jung.io.graphml.GraphMLReader2;
 import graph.EdgeTransformer;
+import graph.GraphTransformer;
 import graph.HyperEdgeTransformer;
+import graph.VertexTransformer;
 
 /**
  * Used to synchronize the agents and give them the input they need.
- * @author Iustin Dumitrescu
- *
  */
 public class Environment {
 
@@ -58,7 +55,7 @@ public class Environment {
 	/**
 	 * The number of steps a robot will backtrack.
 	 */
-	protected int stepsBack = 10;
+	public int stepsBack;
 	
 	/**
 	 * Logger from mains
@@ -70,18 +67,21 @@ public class Environment {
 	 */
 	static Barrier robotBar;
 	
+	int robotType = Robot.BESTAVAILABLE;
+	
+	Vector<EnvironmentFeedback> feedback;
+	
 	/* Debug */
-    JFrame rewardFrame;
-    RewardPanel rewardPan;
-    Scanner sc = new Scanner(System.in);
-    /* ----- */
-    
+	Scanner sc = new Scanner(System.in);
+	/* ----- */
+	
 	/**
 	 * Basic constructor.
 	 * @param input - the filename from which the graph is to be read.
 	 */
 	public Environment(final String input) {
 		this.agents = new Vector<Robot>();
+		this.feedback = new Vector<EnvironmentFeedback>(1);
 		Environment.robotBar = new Barrier();
 		
 		try {
@@ -99,8 +99,6 @@ public class Environment {
 		
 		this.getTarget();
 		
-		//this.sortTop();
-		//this.bfs();
 		this.dfs();
 		
 		logger.info("Target position is " + targetPosition + 
@@ -121,11 +119,6 @@ public class Environment {
 			} catch (InterruptedException ex){}
 		}
 		
-		/*rewardPan = new RewardPanel(this);
-		rewardFrame = new JFrame();
-		rewardFrame.setSize(400, 200);
-		rewardFrame.add(rewardPan);
-		rewardFrame.setVisible(true);*/
 	}
 	
 	/**
@@ -145,7 +138,7 @@ public class Environment {
 	 * @param percentBestPos - the percentage of robots that will act
 	 * 		on the bestPosition behavior
 	 */
-	public void addAgents(double percentBestPos) {
+	public void addAgents() {
 		activeAgents = 0;
 		Collection<Position> verts = network.getVertices();
 		this.agents = new Vector<Robot>();
@@ -159,13 +152,11 @@ public class Environment {
 			/* for each stored robot name */
 			for (String name : p.robotNames) {
 				Robot r;
-				/*XXX asta nu cumva va adauga acelasi tip?
-                 * p.robotNames.size != tot numarul de roboti (= n final)
-                 */
-				if (activeAgents >= percentBestPos * p.robotNames.size())
-					r = new Robot(activeAgents, Robot.BESTAVAILABLE, stepsBack);
-				else 
-					r = new Robot(activeAgents, Robot.BESTPOSITION, stepsBack);
+				if (robotType == Robot.FORESEE) {
+					r = new RobotL2(activeAgents);
+				} else {
+					r = new Robot(activeAgents, robotType);
+				}
 				r.setName(name);
 				r.setCurrentGoal(this.targetPosition);
 				r.setStartPosition(p);
@@ -179,7 +170,19 @@ public class Environment {
 		Environment.robotBar.setNumThreads(activeAgents);
 		this.setRobotPositions();
 
-       // this.setPositionReward();
+		this.setPositionReward();
+		this.setStepsBack();
+	}
+	
+	/**
+	 * Sets the number of steps an agent is to retreat.
+	 */
+	private void setStepsBack() {
+		int steps = network.getVertexCount() / activeAgents;
+		logger.info("Number of steps back " + steps);
+		for (Robot agent : agents) {
+			agent.setNumberStepsBack(steps);
+		}
 	}
 	
 	/**
@@ -188,18 +191,21 @@ public class Environment {
 	private void setPositionReward() {
 		int nVerts = network.getVertexCount();
 		int nAgents = agents.size();
-		int reward;
+		int reward = 10;
 		
 		if (nAgents == 0)
 		        return;
-		if (nAgents == 1) {
-		        reward = nVerts;
-		} else {
-		        reward = nVerts / (nAgents - 1);
-		}
+		
+		// Hard to believe we will have so many vertices so as maxReward to go over
+		//	maxInt.
+		reward = nVerts;
 		logger.debug("Position reward set to " + reward);
 		
-		Position.setReward(reward);
+		Position.setMinReward(reward);
+		targetPosition.givePositiveFeedback(reward + reward * 2 * nVerts);
+		giveFeedback();
+		
+		logger.debug("Target Position reward set to " + (reward + reward * 2 * nVerts));
 	}
 	
 	/**
@@ -242,40 +248,26 @@ public class Environment {
 		this.network = graphReader.readGraph();
 	}
 	
-	private void bfs() {
-		LinkedList<Position> toSearch = new LinkedList<Position>();
-		
-		targetPosition.setTopologicPostion(0);
-		targetPosition.userVar = 1;
-		toSearch.add(targetPosition);
-		
-		while (toSearch.isEmpty() == false) {
-			Position p = toSearch.pop();
-			Collection<Position> neigh = network.getNeighbors(p);
-			
-			for (Position n : neigh) {
-				if (n.userVar == 0) {
-					n.userVar = 1;
-					n.setTopologicPostion(p.getTopologicPostion()+1);
-					toSearch.add(n);
-				}
-			}
-		}
-		
-	}
-	
+	/**
+	 * Traverses the graph with a dfs algorithm and assigns a
+	 * sorting order. Starts from the targetPosition.
+	 */
 	private void dfs() {
 		LinkedList<Position> order = new LinkedList<Position>();
 		explore(targetPosition, order);
 		int i = 0;
 		for (Position p : order) {
-			//System.out.println(p + " " + i);
 			p.setTopologicPostion(i);
 			i++;
 		}
 		
 	}
 	
+	/**
+	 * Used by the dfs algorithm to explore a given node.
+	 * @param vert - the node to be explored.
+	 * @param queue - the queue containing the explored nodes.
+	 */
 	private void explore(Position vert, LinkedList<Position> queue) {
 		Collection<Position> neigh = network.getNeighbors(vert);
 		vert.userVar = 1;
@@ -285,67 +277,6 @@ public class Environment {
 			}
 		}
 		queue.addFirst(vert);
-	}
-	
-	/**
-	 * Used to topologically sort the graph.
-	 */
-	private void sortTop() {
-		
-		// --- Replaced this BFS - might suit our needs better
-		
-		// TODO remove stupid comments after testing code
-		// L - Empty list that will contain the sorted nodes
-		LinkedList<Position> l = new LinkedList<Position>();
-		
-		// S - Set of all nodes with no incoming edges
-		ArrayList<Position> c = new ArrayList<Position>(
-				network.getVertices());
-		
-		Position pos = null;
-		for (Iterator<Position> p = c.iterator(); p.hasNext();) {
-			pos = p.next();			
-			p.remove();
-		}
-		c.add(pos);
-		
-		for (Iterator<Position> p = c.iterator(); p.hasNext();) {
-			pos = p.next();
-			this.visit(pos, l);
-		}
-		
-		int i = 0;
-		for (Iterator<Position> iter = l.iterator(); iter.hasNext(); i++) {
-			Position p = iter.next();
-			p.setTopologicPostion(i);
-		}
-
-		
-	}
-	
-	/**
-	 * Part of the topological sort algorithm.
-	 * Recursive function that marks nodes.
-	 * @param n - the visited node.
-	 * @param l - the list of visited nodes.
-	 */
-	private void visit(final Position n, final LinkedList<Position> l) {
-		// if n has not been visited yet then
-		if (n.userVar == 0) {
-			// mark n as visited
-			n.userVar = 1;
-			
-			Collection<Position> succ = network.getSuccessors(n);
-			//for each node m with an edge from n to m do
-			for (Iterator<Position> itSucc = succ.iterator();
-					itSucc.hasNext();) {
-				Position m = itSucc.next();
-				// visit(m)
-				visit(m, l);
-			}
-			//add n to L
-			l.add(n);
-		}
 	}
 	
 	/**
@@ -365,26 +296,18 @@ public class Environment {
 	 * @return A vector of all available positions.
 	 */
 	public final Vector<Position> getAdjacent(final int robot) {
-		return this.getAdjacent(agents.get(robot));
+		return this.getAdjacent(agents.get(robot).getCurrentPosition());
 	}
 
 	/**
-	 * Gets all adjacent positions for the specified agent.
+	 * Gets all adjacent positions for the specified position.
 	 * This includes anything but obstacles.
-	 * @param robot - the agent to be used.
+	 * @param position
 	 * @return A vector of all available positions.
 	 */
-	public final Vector<Position> getAdjacent(final Robot robot) {
-		Position robPos = robot.getCurrentPosition();
-		LinkedList<Edge> outEdges = new LinkedList<Edge>(network.getOutEdges(robPos));
-		/*Vector<Position> ret =
-			new Vector<Position>(network.getNeighbors(robPos));*/
-		Vector<Position> ret = new Vector<Position>(outEdges.size());
-		
-		for (Edge e : outEdges) {
-			ret.add(network.getOpposite(robPos, e));
-		}
-		
+	public final Vector<Position> getAdjacent(final Position robPos) {		
+		Vector<Position> ret =
+			new Vector<Position>(network.getNeighbors(robPos));
 		return ret;
 	}
 	
@@ -403,7 +326,6 @@ public class Environment {
 	 * @return 0 / 1
 	 */
 	public final synchronized int makeAction(final int robotId, final Position dst) {
-		//logger.debug("MakeAction");
 		
 		Robot r = agents.get(robotId);		
 		Position intialPos = (Position) robotPos.get(robotId);
@@ -413,25 +335,104 @@ public class Environment {
 			intialPos.sem.release();
 		robotPos.set(robotId, dst);
 		
+		giveFeedback(intialPos, dst);
+		
 		logger.debug(r.getName() + " got to " + dst + 
 				"[" + dst.getTopologicPostion() + "]");
 		
-		//rewardPan.update();
-		
-		//while(!sc.nextLine().equals(""));
+		while(!sc.nextLine().equals(""));
 		
 		return 0;
 	}
 	
+	/**
+	 * Informs the environment that the robot has reached the final position
+	 * and therefore should be considered removed from the graph.
+	 * @param robotId - the robot to be removed.
+	 */
 	public final void removeFromMap(int robotId) {
 		targetPosition.sem.release();
 		Robot r = agents.get(robotId);
 		logger.debug(r.getName() + " ejected from map");
-		//robotPos.set(robotId, -1);
+		
 		activeAgents--;
+		
 		if (activeAgents == 0) {
 			logger.info("All agents ejected from map.");
 		}
 	}
+	
+	public int getReducedReward(Position target) {
+		int res = target.pheromone;
+		int nVerts = network.getVertexCount();
+		
+		res -= 2 * nVerts;
+		
+		return res;		
+	}
+	
+	/**
+	 * Sets the robots of the environment to BESTPOSITION.
+	 */
+	public void setRobotTypePosition() {
+		robotType = Robot.BESTPOSITION;
+	}
 
+	/**
+	 * Sets the robots of the environment to BESTAVAILABLE.
+	 */
+	public void setRobotTypeAvailable() {
+		robotType = Robot.BESTAVAILABLE;
+	}
+	
+	/**
+	 * Sets the robots of the environment to FORESEE.
+	 */
+	public void setRobotTypeForesee() {
+		robotType = Robot.FORESEE;
+	}
+	
+	/**
+	 * Updates the chosen rule's fitness
+	 * @param choseRule - the rule after which the agent will move
+	 */
+	public void giveReward(LCSRule chosenRule) {
+		int maxReward = Integer.MIN_VALUE;
+		Vector<Position> ruleAdjancies = getAdjacent(chosenRule.getNext());
+		Position auxiliary;
+		
+		for(Position x : ruleAdjancies) {
+			int distanceFromTarget = Math.abs(x.getTopologicPostion() - 
+					targetPosition.getTopologicPostion());
+			if (x.getFeedback() - distanceFromTarget > maxReward)
+				maxReward = x.getFeedback() - distanceFromTarget;
+		}
+		
+		auxiliary = chosenRule.getCurrent();
+		int distanceFromTarget = 
+			Math.abs(auxiliary.getTopologicPostion() - 
+				targetPosition.getTopologicPostion());
+		if (auxiliary.getFeedback() - distanceFromTarget > maxReward)
+			maxReward = auxiliary.getFeedback() - distanceFromTarget;
+		
+		if (maxReward > chosenRule.getFitness())
+			chosenRule.setFitness(maxReward);
+	}
+	
+	public void addToFeedback(EnvironmentFeedback fb) {
+		this.feedback.add(fb);
+	}
+
+	private void giveFeedback() {
+		for (EnvironmentFeedback fb : this.feedback) {
+			fb.update();
+		}
+	}
+	
+	private void giveFeedback(Position src, Position dst) {
+		for (EnvironmentFeedback fb : this.feedback) {
+			fb.update(src, dst);
+		}
+	}
+	
 }

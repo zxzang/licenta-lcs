@@ -1,7 +1,8 @@
 package lcsmain;
 
 import lcs.Environment;
-import lcsgui.GraphFrame;
+import lcsgui.MainGui;
+
 import org.apache.log4j.*;
 
 public class LcsMain {
@@ -14,14 +15,19 @@ public class LcsMain {
 	public final static boolean DEBUG = false;
 	
 	/**
-	 * The {@link GraphFrame} used for visualizing the {@link Environment}.
+	 * The {@link MainGui} used for visualizing the {@link Environment}.
 	 */
-	static GraphFrame gFrame;
+	static MainGui gui;
 	
 	/**
 	 * Logger used to log debug data and errors.
 	 */
 	public static Logger logger;
+	
+	/**
+	 * The IP to which the UBI client will connect to.
+	 */
+	public static String UBIGraphIP;
 	
 	private static void setLoggers(){
 		logger = Logger.getLogger("LcsMain");
@@ -43,10 +49,12 @@ public class LcsMain {
 		}
 		
 		env = new Environment(args[0]);
-		gFrame = new GraphFrame(env, args[1]);
+		UBIGraphIP = args[1];
 		
-		env.addAgents(0);
+		gui = new MainGui(env);
+		env.addAgents();
 		env.startAgents();
+		
 		/* TODO poate ar fi bine sa separam robotii de topologie 
 				xmlul sa contina doar cum arata graful si atat
 			XXX yeah ... asta a fost o chestie de dragul de a avea ceva ce merge

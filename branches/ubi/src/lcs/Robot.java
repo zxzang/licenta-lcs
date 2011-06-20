@@ -6,14 +6,11 @@ import java.util.Vector;
 
 import org.apache.log4j.*;
 
-
 /**
- * 
- * @author Dascalu Sorin
- *
+ * An abstraction for an agent traversing {@link Environment}.
  */
 public class Robot extends Thread {
-
+	
 	/**
 	 * Class that associates a certain position with the number
 	 * of available routes that go out of it.
@@ -26,7 +23,7 @@ public class Robot extends Thread {
 			nR = y;
 		}
 	}
-
+	
 	/**
 	 * Class that associates a certain position with the its reward.
 	 */
@@ -49,41 +46,87 @@ public class Robot extends Thread {
 		}
 	}
 	
+	/**
+	 * Current position of the robot.
+	 */
 	Position current;
+	
+	/**
+	 * Target position of robot.
+	 */
 	Position target;
+	
+	/**
+	 * Environment where the robot moves.
+	 */
 	Environment env;
+	
+	/**
+	 * Last steps taken by the robot.
+	 */
 	LinkedList<PositionNRoutes> lastSteps;
+	
+	/**
+	 * Number of steps the robot remembers.
+	 */
 	int noStepsBack;
+	
+	/**
+	 * Robot Identification number.
+	 */
 	int robotId;	
+	
+	/**
+	 * Class logger.
+	 */
 	private static Logger logger = Logger.getLogger("Robot");
+	
+	/**
+	 * Common barrier used by all agents.
+	 */
 	private static Barrier bar = Environment.robotBar;
 	
 	/**
-	 * Number of robots instantiated of this class
+	 * Flag that specifies if this robot has found a path to the goal.
+	 */
+	private boolean foundPath;
+	
+	/**
+	 * Number of robots instantiated of this class.
 	 */
 	static int noRobots = 0;
 	
 	/**
-	 * 	Robot type
-	 * 		1  -  Only wants to move on the best position
-	 * 		2  -  Will move on the best position available
+	 * Only wants to move on the best position.
 	 */
 	public static final int BESTPOSITION = 1;
+	
+	/**
+	 * Will move on the best position available.
+	 */
 	public static final int BESTAVAILABLE = 2;
+	
+	/**
+	 * Robot that will take into account 2 position further.
+	 */
+	public static final int FORESEE = 3;
+	
+	/**
+	 * The type of the robot.
+	 */
 	int type;
 	
 	/**
 	 * Basic constructor
 	 * @param robotNum - robot number
 	 * @param type - type of robot
-	 * @param nSteps - number of steps to backtrack.
 	 */
-	public Robot(int robotNum, int type, int nSteps) {
+	public Robot(int robotNum, int type) {
 		robotId = robotNum;
 		this.type = type;
-		noStepsBack = nSteps;
 		lastSteps = new LinkedList<PositionNRoutes>();
 		Robot.noRobots++;
+		this.foundPath = false;
 	}
 	
 	/**
@@ -116,6 +159,14 @@ public class Robot extends Thread {
 		current = start;
 	}
 	
+	/**
+	 * Sets the number steps to retreat.
+	 * @param nSteps - number of steps to backtrack.
+	 */
+	protected void setNumberStepsBack(int steps) {
+		this.noStepsBack = steps;
+	}
+	
 	@Override
 	public void run() {
 		logger.debug(getName() + " is acting like a robot \n"+
@@ -124,24 +175,19 @@ public class Robot extends Thread {
 		Position nextMove = null;
 		Vector<Position> adjacent;
 		String adjacentStr;
+		StringBuffer sbuff = new StringBuffer();
 		
 		while (current != target) {
-			logger.debug("My turn - i am on " + current);			
-			adjacent = env.getAdjacent(this);
-
-			adjacentStr = "";
-			for(Position x:adjacent)
-				adjacentStr += x + " ";
-			//logger.debug("All adjacents: "+adjacentStr);
-
+			logger.debug("My turn - i am on " + current);
+			
+			adjacent = env.getAdjacent(current);
 			removeDeadEnds(adjacent);
 			
-			adjacentStr = "";
-			for(Position x:adjacent)
-				adjacentStr += x + " ";
-			//logger.debug("Goal " + target + "[" +
-			//		target.getTopologicPostion() + "]");
-			logger.debug("Valid adjacents: "+adjacentStr);
+			sbuff.delete(0, sbuff.length());
+			for(Position x : adjacent)
+				sbuff.append(x + " ");
+			adjacentStr = sbuff.toString();
+			logger.debug("Valid adjacents: " + adjacentStr);
 
 			if (adjacent.size() == 1) { // we're stuck
 				logger.debug(getName() + " is on his way backwards");
@@ -149,51 +195,56 @@ public class Robot extends Thread {
 			} else {
 				nextMove = null;
 				
-				
 				//	I'll wait to move till I get a free position in which I can move
 				nextMove = getNextMove(adjacent);
+
 				
-				/**
-				 * XXX This is error prone.
-				 * Situatie: [A][B][0] un rand numerotat 1-3.
-				 * A care se afla pe pozitia 1 ar vrea sa treaca pe poz 2.
-				 * B vrea pe pozitia 3 care e libera.
-				 * initial A o sa tryAquire pe 2, o sa fail + o sa piarda o tura.
-				 * B o sa treaca pe 3, astfel 2 va fi liber.
-				 * Tot consider ca ar trebui sa se faca o buna parte in env
-				 * astfel robotii sa mearga la aceasi viteza.
-				 * Daca nu vrei sa mearga la aceasi viteza si sa lasam la 
-				 * mana schedelurului thats dandy.
-				 * give opinion.
-				 * As vrea chiar sa fac un package pt robot + rules. This isnt mandatory.
-				 */
-				
-				if (nextMove == null){
+				if (nextMove == null) {
 					logger.debug(this.getName() + " held his ground");
-					try{
+					
+					logger.debug("My current position has a current reward of " + 
+							current.pheromone);
+					try {
 						bar.enterBarrier();
 					} catch (InterruptedException ex) {
 						logger.error(this.getName() + "could not enter the barrier");
 					}
 				} else {
+					/**
+					 * If this has proven to be a good position reward the 
+					 * 	lastSteps with half of my reward.
+					 */
+					int reward = env.getReducedReward(nextMove);
+					
+					logger.debug("My current position has a current reward of " + 
+							nextMove.pheromone);
+					
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
 						lastSteps.removeFirst();
+					
+					if (reward > 0 && !foundPath) {
+						for(PositionNRoutes x : lastSteps)
+							//	Will update pheromone only if I am giving a bigger
+							//		reward than the one it had before.
+							//	Implemented a safeguard procedure in the givePositionFeedback
+							//		function so as not not to be greater the reward though.
+							if (x.pos.pheromone < reward)
+								x.pos.givePositiveFeedback(reward);
+						foundPath = true;
+					}
+					
 					env.makeAction(robotId, nextMove);
+					updateChosenRule();
 					
 					current = nextMove;
 					
-					//	Presupunem ca ar fi o pozitie buna daca tot am ajuns in ea
-					//	Cand se va dovedi ca nu e buna o sa ii dam feedback negativ dublu si se va anula efectul benefic
-					current.givePositiveFeedback();
-					
-					try{
+					try {
 						bar.enterBarrier();
 					} catch (InterruptedException ex) {
 						logger.error(this.getName() + "could not enter the barrier");
 					}
-
-				}							
+				}
 			}
 		}
 		
@@ -203,11 +254,18 @@ public class Robot extends Thread {
 	}
 	
 	/**
+	 * Function stub; will only be used on the 2nd level robots
+	 */
+	public void updateChosenRule(){
+		
+	}
+	
+	/**
 	 * Returns the best Position to take out of the given neighbors.
 	 * @param available - a vector of potential successors.
 	 * @return The best position to go to.
 	 */
-	Position getNextMove(Vector<Position> available) {
+	protected Position getNextMove(Vector<Position> available) {
 		switch (this.type) {
 		case BESTPOSITION:
 			// Robot care vrea neaparat sa se miste pe cea mai buna pozitie
@@ -221,11 +279,16 @@ public class Robot extends Thread {
 		}
 	}
 	
-	Position getNextMoveAbsolute(Vector<Position> available) {
-		//logger.debug("eu " + getName() + " cer mutare absolute best");
+	/** 
+	 * If possible it reserves the best Position to move into
+	 * 	and returns the position.
+	 * If not it returns null.
+	 * @param available - available Positions to move into
+	 * @return null or Position in which to move
+	 */
+	private Position getNextMoveAbsolute(Vector<Position> available) {
 		Position bestPos = null;
-		// XXX what?! MIN_VALUE e deja negativ, you sure?
-		int bestReward = -Integer.MIN_VALUE;
+		int bestReward = Integer.MIN_VALUE;
 		int tempReward;
 		
 		/**
@@ -240,15 +303,21 @@ public class Robot extends Thread {
 				bestPos = i;
 			}
 		}
-			
+		
 		if (bestPos != null && bestPos.sem.tryAcquire())
 			return bestPos;
 		else
 			return null;
 	}
 	
-	Position getNextMoveAvailable(Vector<Position> available) {
-		//System.out.println("eu " + getName() + " cer mutare best available");
+	/** 
+	 * If possible it reserves the next best Position to move into
+	 * 	and returns the position.
+	 * If all Positions are taken it returns null.
+	 * @param available - available Positions to move into
+	 * @return null or Position in which to move
+	 */
+	private Position getNextMoveAvailable(Vector<Position> available) {
 		int tempReward;
 		PositionNReward queueElement;
 		Position nextMove;
@@ -257,7 +326,7 @@ public class Robot extends Thread {
 		
 		/**
 		 * I will the try the first best move available.
-		 * If all my neighbours are occupied I will hold my ground.
+		 * If all my neighbors are occupied I will hold my ground.
 		 */
 		
 		for (Position i: available) {
@@ -280,6 +349,11 @@ public class Robot extends Thread {
 		return null;
 	}
 	
+	/**
+	 * Removes Positions that have proven to be dead ends or part of dead ends
+	 * 	from a vector of Positions.
+	 * @param adjacent - vector of adjacent Positions of a certain Position
+	 */
 	void removeDeadEnds(Vector<Position> adjacent) {
 		Vector<Position> toRemove = new Vector<Position>();
 		for(Position x:adjacent)
@@ -289,6 +363,10 @@ public class Robot extends Thread {
 			adjacent.remove(x);
 	}
 	
+	/**
+	 * Goes back a number of memorized steps and rewards negatively
+	 * 	all the the Positions on that path.
+	 */
 	void goBackNMark() {
 		// should I block the current node ?
 		boolean toBlock = true;
@@ -297,7 +375,7 @@ public class Robot extends Thread {
 		// the next position in my road back
 		Position nextMove;
 		// the no. of available routes at me current position
-		int noARoutes;		
+		int noARoutes;
 		
 		while (!lastSteps.isEmpty()) {
 			logger.debug(getName() + " is moving backward");
@@ -305,46 +383,42 @@ public class Robot extends Thread {
 			aux = lastSteps.removeLast();
 			nextMove = aux.pos;
 
-			/*
-			 *  Part where I check out how to block certain routes
-			 */
+			/* Part where I check out how to block certain routes */
 			if (toBlock) {
 				nextMove.blockRoute(current);
 				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
-				current.blockRoute(nextMove);				
+				current.blockRoute(nextMove);
 				aux.nR--;
 			}
-			//	--- Give negative feedback now is double off positive feedback
-			current.giveNegativeFeedback();
+			
 			current.giveNegativeFeedback();
 			
 			noARoutes = aux.nR;
 			
 			// there is one way .. the way back. Block the position I say
-			if (noARoutes <= 1 && toBlock)
+			if (noARoutes <= 1 && toBlock) {
 				toBlock = true;			
-			else // blocked a route but others are available .. position stands
+			} else {// blocked a route but others are available .. position stands
 				toBlock = false;
+			}
 			
-			/*
-			 * Actual movement backwards
-			 */
-			while (!nextMove.sem.tryAcquire()){
-				try{
+			/* Actual movement backwards */
+			while (!nextMove.sem.tryAcquire()) {
+				try {
 					logger.debug(getName() + " held his ground " + current +
 							"\n\twaiting for a previous " + nextMove +
 							" to be free");
 					bar.enterBarrier();
-				} catch (InterruptedException ex){
+				} catch (InterruptedException ex) {
 					logger.error(getName() + "could not enter barrier");
 				}
 			}
 
 			env.makeAction(robotId, nextMove);
 			current = nextMove;
-			try{
+			try {
 				bar.enterBarrier();
-			} catch (InterruptedException ex){
+			} catch (InterruptedException ex) {
 				logger.error(getName() + "could not enter barrier");
 			}
 		}
