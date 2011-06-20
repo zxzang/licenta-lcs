@@ -333,7 +333,6 @@ public class Environment {
 	 * @return 0 / 1
 	 */
 	public final synchronized int makeAction(final int robotId, final Position dst) {
-		//logger.debug("MakeAction");
 		
 		Robot r = agents.get(robotId);		
 		Position intialPos = (Position) robotPos.get(robotId);
@@ -393,24 +392,23 @@ public class Environment {
 		robotType = Robot.BESTAVAILABLE;
 	}
 	
+	/**
+	 * Sets the robots of the environment to FORESEE.
+	 */
 	public void setRobotTypeForesee() {
 		robotType = Robot.FORESEE;
 	}
-	
-	// TODO am folosit mostly Position.pheromone... uitasem de functia getFeedback
-	//		de pus pheromone private si inlocuit peste tot cu getFeedback.
-	//		Voi folosi de acum getFeedback()
 	
 	/**
 	 * Updates the chosen rule's fitness
 	 * @param choseRule - the rule after which the agent will move
 	 */
-	public void giveReward(LCSRule chosenRule){
+	public void giveReward(LCSRule chosenRule) {
 		int maxReward = Integer.MIN_VALUE;
 		Vector<Position> ruleAdjancies = getAdjacent(chosenRule.getNext());
 		Position auxiliary;
 		
-		for(Position x:ruleAdjancies){
+		for(Position x : ruleAdjancies) {
 			int distanceFromTarget = Math.abs(x.getTopologicPostion() - 
 					targetPosition.getTopologicPostion());
 			if (x.getFeedback() - distanceFromTarget > maxReward)
