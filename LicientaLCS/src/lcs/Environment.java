@@ -10,9 +10,6 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Vector;
 
-import javax.swing.JFrame;
-
-import lcsgui.RewardPanel;
 import lcsmain.LcsMain;
 
 import org.apache.log4j.Logger;
@@ -72,9 +69,9 @@ public class Environment {
 	
 	int robotType = Robot.BESTAVAILABLE;
 	
+	Vector<EnvironmentFeedback> feedback;
+	
 	/* Debug */
-	JFrame rewardFrame;
-	RewardPanel rewardPan;
 	Scanner sc = new Scanner(System.in);
 	/* ----- */
 	
@@ -84,6 +81,7 @@ public class Environment {
 	 */
 	public Environment(final String input) {
 		this.agents = new Vector<Robot>();
+		this.feedback = new Vector<EnvironmentFeedback>(1);
 		Environment.robotBar = new Barrier();
 		
 		try {
@@ -121,11 +119,6 @@ public class Environment {
 			} catch (InterruptedException ex){}
 		}
 		
-		rewardPan = new RewardPanel(this);
-		rewardFrame = new JFrame();
-		rewardFrame.setSize(400, 300);
-		rewardFrame.add(rewardPan);
-		rewardFrame.setVisible(true);
 	}
 	
 	/**
@@ -210,7 +203,7 @@ public class Environment {
 		
 		Position.setMinReward(reward);
 		targetPosition.givePositiveFeedback(reward + reward * 2 * nVerts);
-		rewardPan.update();
+		giveFeedback();
 		
 		logger.debug("Target Position reward set to " + (reward + reward * 2 * nVerts));
 	}
@@ -342,10 +335,10 @@ public class Environment {
 			intialPos.sem.release();
 		robotPos.set(robotId, dst);
 		
+		giveFeedback(intialPos, dst);
+		
 		logger.debug(r.getName() + " got to " + dst + 
 				"[" + dst.getTopologicPostion() + "]");
-		
-		rewardPan.update();
 		
 		while(!sc.nextLine().equals(""));
 		
@@ -424,6 +417,22 @@ public class Environment {
 		
 		if (maxReward > chosenRule.getFitness())
 			chosenRule.setFitness(maxReward);
+	}
+	
+	public void addToFeedback(EnvironmentFeedback fb) {
+		this.feedback.add(fb);
+	}
+
+	private void giveFeedback() {
+		for (EnvironmentFeedback fb : this.feedback) {
+			fb.update();
+		}
+	}
+	
+	private void giveFeedback(Position src, Position dst) {
+		for (EnvironmentFeedback fb : this.feedback) {
+			fb.update(src, dst);
+		}
 	}
 	
 }
