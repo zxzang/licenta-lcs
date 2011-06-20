@@ -20,6 +20,8 @@ public class LCSRule {
 	}
 	
 	public int getFitness() {
+		if (next.getFeedback() - next.getTopologicPostion() > fitness)
+			fitness = next.getFeedback() - next.getTopologicPostion();
 		return fitness;
 	}
 	
@@ -68,22 +70,27 @@ public class LCSRule {
 			if (x.getFitness() < minFitness)
 				minFitness = x.getFitness();
 		}
+		System.err.println("Min Fitness " + minFitness);
 		
 		if (minFitness < 0) {
 			for (LCSRule x : validRules)
-				x.setFitness(x.getFitness() + minFitness + 1);
+				x.setFitness(x.getFitness() + Math.abs(minFitness)+ 1);
 		}
 		
-		for (LCSRule x : validRules)
+		for (LCSRule x : validRules){
 			totalFitness += x.getFitness();
+			System.err.println(x.getFitness() + " at rule " + x.getCurrent() + 
+					" - " + x.getNext());
+		}
 		
 		System.err.println("atat " + totalFitness);
 		
 		chosenFitness = Math.abs(rand.nextLong() % totalFitness);
+		System.err.println("chose " + chosenFitness);
 		
 		for(LCSRule x : validRules) {
 			currentFitness += x.getFitness();
-			if (currentFitness > totalFitness) {
+			if (currentFitness > chosenFitness) {
 				res = x;
 				break;
 			}
@@ -92,7 +99,7 @@ public class LCSRule {
 		//	Reset fitness of rules to their original
 		if (minFitness < 0) {
 			for(LCSRule x : validRules)
-				x.setFitness(x.getFitness() - minFitness - 1);
+				x.setFitness(x.getFitness() - Math.abs(minFitness) - 1);
 		}		
 		
 		return res;

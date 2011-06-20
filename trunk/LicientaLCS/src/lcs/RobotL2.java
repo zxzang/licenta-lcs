@@ -32,7 +32,10 @@ public class RobotL2 extends Robot {
 		if (selectedRule != null)
 			res = selectedRule.getNext();
 		
-		return res;
+		if (res.sem.tryAcquire())
+			return res;
+		
+		return null;
 	}
 	
 	/**
