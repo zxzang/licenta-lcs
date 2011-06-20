@@ -1,7 +1,8 @@
 package lcsmain;
 
 import lcs.Environment;
-import lcsgui.GraphFrame;
+import lcsgui.MainGui;
+
 import org.apache.log4j.*;
 
 public class LcsMain {
@@ -14,9 +15,9 @@ public class LcsMain {
 	public final static boolean DEBUG = false;
 	
 	/**
-	 * The {@link GraphFrame} used for visualizing the {@link Environment}.
+	 * The {@link MainGui} used for visualizing the {@link Environment}.
 	 */
-	static GraphFrame gFrame;
+	static MainGui gui;
 	
 	/**
 	 * Logger used to log debug data and errors.
@@ -43,7 +44,7 @@ public class LcsMain {
 		}
 		
 		env = new Environment(args[0]);
-		//gFrame = new GraphFrame(env);
+		gui = new MainGui(env);
 		env.addAgents();
 		env.startAgents();
 		/* TODO poate ar fi bine sa separam robotii de topologie 

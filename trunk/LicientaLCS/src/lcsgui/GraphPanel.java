@@ -2,7 +2,7 @@ package lcsgui;
 
 import java.awt.Dimension;
 
-import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import lcs.Edge;
 import lcs.Environment;
@@ -13,9 +13,9 @@ import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 /**
- * A gui for the {@link Environment} type.
+ * A GUI for the {@link Environment} type.
  */
-public class GraphFrame extends JFrame {
+public class GraphPanel extends JPanel {
 	/**
 	 * Serial Version UID.
 	 * Eclipse wouldn't shut up about it.
@@ -28,21 +28,20 @@ public class GraphFrame extends JFrame {
 	private Environment env;
 	
 	/**
-	 * The width of the frame.
+	 * The width of the panel.
 	 */
-	static final int WIDTH = 1024;
+	static final int WIDTH = 800;
 	
 	/**
-	 * The height of the frame.
+	 * The height of the panel.
 	 */
-	static final int HEIGHT = 800;
+	static final int HEIGHT = 600;
 	
 	/**
 	 * Constructor for the class.
 	 * @param e - the {@link Environment} to be displayed.
 	 */
-	public GraphFrame(final Environment e) {
-		super("LCS System");
+	public GraphPanel(final Environment e) {
 		this.env = e;
 		
 		Layout<lcs.Position, Edge> layout =
@@ -56,10 +55,9 @@ public class GraphFrame extends JFrame {
 		vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<Edge>());
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		
-		this.getContentPane().add(vv);
+		this.add(vv);
 		
 		this.setBounds(0, 0, WIDTH, HEIGHT);
-		this.addWindowListener(new GraphWindowCloser());
 		this.setVisible(true);
 	}
 	

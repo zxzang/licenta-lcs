@@ -1,5 +1,7 @@
 package lcsgui;
 
+import java.util.HashMap;
+
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,28 +32,35 @@ public class RewardPanel extends JPanel {
 		}
 	}
 	
-	private Field info[];
+	private HashMap<Position, Field> info;
+	
+	private Environment env;
 	
 	public RewardPanel(Environment env) {
 		super();
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		info = new Field[env.getGraph().getVertexCount()];
+		this.env = env;
+		info = new HashMap<Position, RewardPanel.Field>(env.getGraph().getVertexCount());
 		
-		int i = 0;
 		for (Position pos : env.getGraph().getVertices()) {
-			info[i] = new Field(pos);
-			this.add(info[i++]);
+			Field f = new Field(pos);
+			info.put(pos, f);
+			this.add(f);
 		}
 		
-		this.setSize(300, info.length*30);
+		this.setSize(300, info.size()*30);
 	}
 	
 	public void update() {
-		for (Field f : info) {
-			f.update();
+		for (Position pos : env.getGraph().getVertices()) {
+			info.get(pos).update();
 		}
+	}
+	
+	public void update(Position pos) {
+		info.get(pos).update();
 	}
 	
 }
