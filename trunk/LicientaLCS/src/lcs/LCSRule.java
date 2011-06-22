@@ -3,8 +3,6 @@ package lcs;
 import java.util.Random;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
 public class LCSRule {
 	
 	/**
@@ -26,11 +24,6 @@ public class LCSRule {
 	 * A random number generator collectively used by the class.
 	 */
 	static Random rand = new Random();
-	
-	/**
-	 * Class logger.
-	 */
-	private static Logger logger = Logger.getLogger("Robot");
 	
 	/**
 	 * Gets the first position.
@@ -116,9 +109,10 @@ public class LCSRule {
 		long chosenFitness;
 		long currentFitness = 0;
 		
-		//Fitness can be negative; to be able to generate a true random
-		//	amongst the rules we will have to make them all positive
-		//	and after that randomize depending on fitness value.
+		/* Fitness can be negative; to be able to generate a true random
+		 * amongst the rules we will have to make them all positive
+		 * and after that randomize depending on fitness value.
+		 */
 		
 		if (validRules.size() == 0)
 			return null;
@@ -128,8 +122,6 @@ public class LCSRule {
 				minFitness = x.getFitness();
 		}
 		
-		logger.debug("Min Fitness " + minFitness);
-		
 		if (minFitness < 0) {
 			for (LCSRule x : validRules)
 				x.setFitness(x.getFitness() + Math.abs(minFitness)+ 1);
@@ -137,12 +129,9 @@ public class LCSRule {
 		
 		for (LCSRule x : validRules) {
 			totalFitness += x.getFitness();
-			logger.debug(x.getFitness() + " at rule " + x.getCurrent() + 
-					" - " + x.getNext());
 		}
 		
 		chosenFitness = Math.abs(rand.nextLong() % totalFitness);
-		logger.debug("chose " + chosenFitness);
 		
 		for(LCSRule x : validRules) {
 			currentFitness += x.getFitness();
@@ -152,7 +141,7 @@ public class LCSRule {
 			}
 		}
 		
-		//	Reset fitness of rules to their original
+		/*	Reset fitness of rules to their original */
 		if (minFitness < 0) {
 			for(LCSRule x : validRules)
 				x.setFitness(x.getFitness() - Math.abs(minFitness) - 1);
