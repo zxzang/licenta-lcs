@@ -2,8 +2,6 @@ package lcs;
 
 /**
  * Edge for connecting 2 Positions.
- * @author Iustin Dumitrescu
- *
  */
 public class Edge {
 	/**
@@ -19,7 +17,7 @@ public class Edge {
 	String secondName;
 	
 	/**
-	 * To look pretty in gui.
+	 * To look pretty in GUI.
 	 */
 	String name;
 	

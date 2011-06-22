@@ -5,13 +5,11 @@ import java.util.Map;
 import lcs.Position;
 
 import org.apache.commons.collections15.Transformer;
-import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.io.graphml.NodeMetadata;
 
 /**
- * @author Dumitrescu Iustin
- *
+ * Used to read the input XML.
  */
 public class VertexTransformer implements Transformer<NodeMetadata, Position> {
 
@@ -24,8 +22,6 @@ public class VertexTransformer implements Transformer<NodeMetadata, Position> {
 	 * The string with which a vertex has its type defined.
 	 */
 	private static final String ROBOTKEY = "robot";
-	
-	private static Logger logger = Logger.getLogger("VertexTransformer");
 	
 	@Override
 	public final Position transform(final NodeMetadata metadata) {

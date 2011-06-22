@@ -5,8 +5,6 @@ import java.util.concurrent.Semaphore;
 
 /**
  * Marks a node within the graph.
- * @author Iustin Dumitrescu
- *
  */
 public class Position {
 	/**
