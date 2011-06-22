@@ -38,13 +38,17 @@ public class LcsMain {
 		
 		setLoggers();		
 		
-		if (args.length != 1) {
-			System.err.println("Please provide an input xml.");
+		if (args.length != 1 && args.length != 2) {
+			System.err.println("Input format: xml [ip].");
 			return;
 		}
 		
 		env = new Environment(args[0]);
-		gui = new MainGui(env);
+		if (args.length == 2) {
+			gui = new MainGui(env, args[1]);
+		} else {
+			gui = new MainGui(env);
+		}
 		env.addAgents();
 		env.startAgents();
 		/* TODO poate ar fi bine sa separam robotii de topologie 
