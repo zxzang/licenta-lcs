@@ -15,8 +15,6 @@ import edu.uci.ics.jung.io.graphml.GraphMetadata.EdgeDefault;
 
 /**
  * Used to create a graph from a GraphML.
- * @author Dumitrescu Iustin
- *
  */
 public class GraphTransformer implements
 		Transformer<GraphMetadata, Graph<Position, Edge>> {
