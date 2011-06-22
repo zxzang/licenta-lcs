@@ -40,7 +40,7 @@ public class Environment {
 	/**
 	 * The agents that are currently in the environment.
 	 */
-	Vector<Robot> agents;
+	public Vector<Robot> agents;
 	
 	/**
 	 * The number of agents active in the environment.
@@ -196,8 +196,9 @@ public class Environment {
 		if (nAgents == 0)
 		        return;
 		
-		// Hard to believe we will have so many vertices so as maxReward to go over
-		//	maxInt.
+		/* Hard to believe we will have so many vertices so as
+		 * maxReward to go over	maxInt.
+		 */
 		reward = nVerts;
 		logger.debug("Position reward set to " + reward);
 		
@@ -249,7 +250,7 @@ public class Environment {
 	}
 	
 	/**
-	 * Traverses the graph with a dfs algorithm and assigns a
+	 * Traverses the graph with a DFS algorithm and assigns a
 	 * sorting order. Starts from the targetPosition.
 	 */
 	private void dfs() {
@@ -264,7 +265,7 @@ public class Environment {
 	}
 	
 	/**
-	 * Used by the dfs algorithm to explore a given node.
+	 * Used by the DFS algorithm to explore a given node.
 	 * @param vert - the node to be explored.
 	 * @param queue - the queue containing the explored nodes.
 	 */
@@ -368,7 +369,7 @@ public class Environment {
 		
 		res -= 2 * nVerts;
 		
-		return res;		
+		return res;
 	}
 	
 	/**

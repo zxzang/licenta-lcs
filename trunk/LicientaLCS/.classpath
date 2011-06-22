@@ -25,23 +25,6 @@
 	<classpathentry kind="lib" path="Libraries/Apache-xmlrpc/xmlrpc-client-3.1.3.jar"/>
 	<classpathentry kind="lib" path="Libraries/Apache-xmlrpc/xmlrpc-common-3.1.3.jar"/>
 	<classpathentry kind="lib" path="Libraries/Apache-xmlrpc/xmlrpc-server-3.1.3.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/collections-generic-4.01.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/colt-1.2.0.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/concurrent-1.3.4.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/j3d-core-1.3.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-3d-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-3d-demos-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-algorithms-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-api-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-graph-impl-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-io-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-jai-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-jai-samples-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-samples-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/jung-visualization-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/stax-api-1.0.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/vecmath-1.3.1.jar"/>
-	<classpathentry kind="lib" path="Libraries/Jung/wstx-asl-3.2.6.jar"/>
 	<classpathentry kind="lib" path="Libraries/Log4j/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="Libraries/Ubigraph/ubigraph.jar"/>
 	<classpathentry kind="output" path="bin"/>
