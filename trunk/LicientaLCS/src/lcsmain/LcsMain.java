@@ -44,12 +44,12 @@ public class LcsMain {
 		}
 		
 		env = new Environment(args[0]);
+		env.addAgents();
 		if (args.length == 2) {
 			gui = new MainGui(env, args[1]);
 		} else {
 			gui = new MainGui(env);
 		}
-		env.addAgents();
 		env.startAgents();
 		/* TODO poate ar fi bine sa separam robotii de topologie 
 				xmlul sa contina doar cum arata graful si atat
