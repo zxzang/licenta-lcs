@@ -52,7 +52,6 @@ public class GraphPanel extends JPanel {
 			BasicVisualizationServer<lcs.Position, Edge>(layout);
 		vv.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<lcs.Position>());
-		vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller<Edge>());
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		
 		this.add(vv);

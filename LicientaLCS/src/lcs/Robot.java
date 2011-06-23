@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
 
 /**
  * An abstraction for an agent traversing {@link Environment}.
@@ -422,6 +422,11 @@ public class Robot extends Thread {
 				logger.error(getName() + "could not enter barrier");
 			}
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return this.getName();
 	}
 	
 }
