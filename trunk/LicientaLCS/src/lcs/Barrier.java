@@ -3,12 +3,10 @@ package lcs;
 public class Barrier {
 	static int noThreadsMax;
 	static int noThreadCurrent;
+	private Environment env;
 	
-	public Barrier(){
-		
-	}
-	public Barrier(int nThreads){
-		noThreadsMax = nThreads;		
+	public Barrier(Environment env){
+		this.env = env;
 	}
 	
 	public void setNumThreads(int nThreads){
@@ -20,6 +18,7 @@ public class Barrier {
 		noThreadCurrent ++;
 		if (noThreadCurrent == noThreadsMax){			
 			noThreadCurrent = 0;
+			env.sendChange();
 			System.out.println("------------------");
 			notifyAll();
 		}

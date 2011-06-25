@@ -82,7 +82,7 @@ public class Environment {
 	public Environment(final String input) {
 		this.agents = new Vector<Robot>();
 		this.feedback = new Vector<EnvironmentFeedback>(1);
-		Environment.robotBar = new Barrier();
+		Environment.robotBar = new Barrier(this);
 		
 		try {
 			this.getGraph(input);
@@ -433,6 +433,12 @@ public class Environment {
 	private void giveFeedback(Position src, Position dst) {
 		for (EnvironmentFeedback fb : this.feedback) {
 			fb.update(src, dst);
+		}
+	}
+	
+	public void sendChange() {
+		for (EnvironmentFeedback fb : this.feedback) {
+			fb.change();
 		}
 	}
 	

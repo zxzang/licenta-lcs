@@ -19,4 +19,11 @@ public interface EnvironmentFeedback {
 	 */
 	public void update(Position src, Position dst);
 	
+	/**
+	 * A class that implements this interface can store the commands from update.
+	 * This is done so all the changes can be done at once.
+	 * Useful for changes that need to sleep.
+	 */
+	public void change();
+	
 }
