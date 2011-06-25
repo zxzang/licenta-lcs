@@ -38,6 +38,12 @@ public class JUNGFrame extends JFrame implements EnvironmentFeedback {
 	public void update(Position src, Position dst) {
 		rewardPan.update();
 	}
+	 
+	@Override
+	public void change() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	private void initFrame() {
 		graphPanel = new GraphPanel(env);

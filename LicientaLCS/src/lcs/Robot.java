@@ -174,8 +174,8 @@ public class Robot extends Thread {
 				current.getTopologicPostion() + "]");
 		Position nextMove = null;
 		Vector<Position> adjacent;
-		String adjacentStr;
-		StringBuffer sbuff = new StringBuffer();
+		/*String adjacentStr; // Consider deleting?
+		StringBuffer sbuff = new StringBuffer();*/
 		
 		while (current != target) {
 			logger.debug("My turn - i am on " + current);
@@ -183,11 +183,11 @@ public class Robot extends Thread {
 			adjacent = env.getAdjacent(current);
 			removeDeadEnds(adjacent);
 			
-			sbuff.delete(0, sbuff.length());
+			/*sbuff.delete(0, sbuff.length());
 			for(Position x : adjacent)
 				sbuff.append(x + " ");
 			adjacentStr = sbuff.toString();
-			logger.debug("Valid adjacents: " + adjacentStr);
+			logger.debug("Valid adjacents: " + adjacentStr);*/
 
 			if (adjacent.size() == 1) { // we're stuck
 				logger.debug(getName() + " is on his way backwards");
@@ -202,8 +202,8 @@ public class Robot extends Thread {
 				if (nextMove == null) {
 					logger.debug(this.getName() + " held his ground");
 					
-					logger.debug("My current position has a current reward of " + 
-							current.pheromone);
+					//logger.debug("My current position has a current reward of " + 
+					//		current.pheromone);
 					try {
 						bar.enterBarrier();
 					} catch (InterruptedException ex) {
@@ -216,8 +216,8 @@ public class Robot extends Thread {
 					 */
 					int reward = env.getReducedReward(nextMove);
 					
-					logger.debug("My current position has a current reward of " + 
-							nextMove.pheromone);
+					//logger.debug("My current position has a current reward of " + 
+					//		nextMove.pheromone);
 					
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
