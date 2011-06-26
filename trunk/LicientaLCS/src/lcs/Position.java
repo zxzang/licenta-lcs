@@ -58,6 +58,12 @@ public class Position {
 	 * The type of the current position.
 	 */
 	int type;
+	
+	/**
+	 * The position that returns an agent to a valid
+	 * 	path if this is a blocked position.
+	 */
+	private Position wayBack;
 
 	/**
 	 * Indicates which robot is currently occupying this position.
@@ -140,6 +146,22 @@ public class Position {
 	 */
 	public final String getName() {
 		return this.namePos;
+	}
+	
+	/**
+	 * Set the position that returns to a valid route.
+	 * @param nextP - position to be set.
+	 */
+	public final void setWayBack(Position nextP){
+		wayBack = nextP;
+	}
+	
+	/**
+	 * Get position that returns to a valid route.
+	 * @return The position.
+	 */
+	public final Position getWayBack(){
+		return wayBack;
 	}
 	
 	/**
