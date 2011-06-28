@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file was written by the JAVA GraphML Library. -->
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+	
+	<key id="robotType" for="graph" attr.name="robotType" attr.type="string"/>
+	
+	<key id="nodeType" for="node" attr.name="nodeType" attr.type="string">
+		<default>normal</default>
+	</key>
+	
+	<key id="robot1" for="node" attr.name="robot" attr.type="string"/>
+	<key id="robot2" for="node" attr.name="robot" attr.type="string"/>
+	<key id="robot3" for="node" attr.name="robot" attr.type="string"/>
+	
+	<graph id="G" edgedefault="undirected">
+		<data key="robotType">Foresee</data>
+	
+		<!-- nodes -->
+		<node id="c0">
+			<data key="robot1">bender</data>
+		</node>
+		<node id="c1">
+			<data key="robot2">r2d2</data>
+		</node>
+		<node id="c2">
+			<data key="robot3">data</data>
+		</node>
+		<node id="c3">
+			<data key="robot3">dalek</data>
+		</node>
+		<node id="c4">
+			<data key="robot3">Funnybot</data>
+		</node>
+		<node id="c5">
+			<data key="robot3">AWESOM-O</data>
+		</node>
+		<node id="c6">
+			<data key="nodeType">final</data>
+		</node>
+		
+		
+		<!-- edges -->
+		
+		<edge id="e01" source="c0" target="c1"/>
+		<edge id="e03" source="c0" target="c3"/>
+		<edge id="e04" source="c0" target="c4"/>
+		
+		<edge id="e34" source="c3" target="c4"/>
+		<edge id="e35" source="c3" target="c5"/>
+		
+		<edge id="e12" source="c1" target="c2"/>
+		<edge id="e26" source="c2" target="c6"/>
+		<edge id="e56" source="c5" target="c6"/>
+	</graph>
+</graphml>
+
