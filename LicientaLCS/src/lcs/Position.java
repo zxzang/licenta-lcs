@@ -204,8 +204,7 @@ public class Position {
 	public final int getFeedback() {
 		return this.pheromone;
 	}
-
-
+	
 	/**
 	 * Used by the Environment to specify a position within the
 	 * topological sort.

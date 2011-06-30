@@ -8,9 +8,8 @@ public class RobotL2 extends Robot {
 	private LCSRule selectedRule;
 	
 	public RobotL2(int robotNum) {
-		super(robotNum, Robot.BESTAVAILABLE);
+		super(robotNum, Robot.FORESEE);
 		ruleSet = new Vector<LCSRule>();
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -39,9 +38,9 @@ public class RobotL2 extends Robot {
 	}
 	
 	/**
-	 * Function stub; will only be used on the 2nd level robots
+	 * Requests the {@link Environment} to reward the rule.
 	 */
-	public void updateChosenRule(){
+	public void updateChosenRule() {
 		env.giveReward(selectedRule);
 	}
 }
