@@ -326,7 +326,7 @@ public class Environment {
 	 * @param dst - the destination desired by the agent.
 	 * @return 0 / 1
 	 */
-	public final synchronized int makeAction(final int robotId, final Position dst) {
+	protected final synchronized int makeAction(final int robotId, final Position dst) {
 		
 		Robot r = agents.get(robotId);		
 		Position intialPos = (Position) robotPos.get(robotId);
@@ -351,7 +351,7 @@ public class Environment {
 	 * and therefore should be considered removed from the graph.
 	 * @param robotId - the robot to be removed.
 	 */
-	public final void removeFromMap(int robotId) {
+	protected final void removeFromMap(int robotId) {
 		targetPosition.sem.release();
 		Robot r = agents.get(robotId);
 		logger.debug(r.getName() + " ejected from map");
@@ -363,7 +363,7 @@ public class Environment {
 		}
 	}
 	
-	public int getReducedReward(Position target) {
+	protected int getReducedReward(Position target) {
 		int res = target.pheromone;
 		int nVerts = network.getVertexCount();
 		
@@ -397,7 +397,7 @@ public class Environment {
 	 * Updates the chosen rule's fitness
 	 * @param choseRule - the rule after which the agent will move
 	 */
-	public void giveReward(LCSRule chosenRule) {
+	protected void giveReward(LCSRule chosenRule) {
 		int maxReward = Integer.MIN_VALUE;
 		Vector<Position> ruleAdjancies = getAdjacent(chosenRule.getNext());
 		Position auxiliary;
