@@ -11,30 +11,49 @@ public class RobotL2 extends Robot {
 		super(robotNum, Robot.FORESEE);
 		ruleSet = new Vector<LCSRule>();
 	}
+	
+	protected void removePastSeenNodes(Vector<Position> available){
+		for(Position x:available)
+			if (lastSteps.contains(x))
+				available.remove(x);
+	}
 
 	@Override
 	protected Position getNextMove(Vector<Position> available) {
 		Position res = null;
+		//Position source = null;
+		//removePastSeenNodes(available);
 		
-		selectedRule = LCSRule.selectRule(ruleSet, current, available);
-		
-		if (selectedRule == null) {
-			for(Position x : available) {
-				int fitness = - Math.abs(x.getTopologicPostion() -
-						current.getTopologicPostion());
-				LCSRule newRule = new LCSRule(current, x, fitness);
-				ruleSet.add(newRule);
-			}
+		/*
+		if (lastSteps.size() >= 2)
+			source = lastSteps.get(1).pos;
+		if (source != null && available.contains(source) 
+				&& available.size() > 1)
+			available.remove(source);
+			*/
+		if (available.size() > 0){
 			selectedRule = LCSRule.selectRule(ruleSet, current, available);
-		}
+			
+			if (selectedRule == null) {
+				for(Position x : available) {
+					int fitness = - Math.abs(x.getTopologicPostion() -
+							current.getTopologicPostion());
+					LCSRule newRule = new LCSRule(current, x, fitness);
+					ruleSet.add(newRule);
+				}
+				selectedRule = LCSRule.selectRule(ruleSet, current, available);
+			}
+			
+			if (selectedRule != null)
+				res = selectedRule.getNext();
+			
+			if (res.sem.tryAcquire())
+				return res;
+			
+			return null;
+		} else
+			return null;
 		
-		if (selectedRule != null)
-			res = selectedRule.getNext();
-		
-		if (res.sem.tryAcquire())
-			return res;
-		
-		return null;
 	}
 	
 	/**
