@@ -438,8 +438,8 @@ public class Robot extends Thread {
 			} catch (InterruptedException ex) {
 				logger.error(getName() + "could not enter barrier");
 			}
-			if (exit = true)
-				break;
+			//if (exit == true)
+			//	break;
 		}
 	}
 	
