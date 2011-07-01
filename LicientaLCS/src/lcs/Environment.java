@@ -71,9 +71,7 @@ public class Environment {
 	
 	Vector<EnvironmentFeedback> feedback;
 	
-	/* Debug */
-	Scanner sc = new Scanner(System.in);
-	/* ----- */
+
 	
 	/**
 	 * Basic constructor.
@@ -341,7 +339,7 @@ public class Environment {
 		logger.debug(r.getName() + " got to " + dst + 
 				"[" + dst.getTopologicPostion() + "]");
 		
-		while(!sc.nextLine().equals(""));
+		
 		
 		return 0;
 	}
@@ -354,12 +352,15 @@ public class Environment {
 	protected final void removeFromMap(int robotId) {
 		targetPosition.sem.release();
 		Robot r = agents.get(robotId);
-		logger.debug(r.getName() + " ejected from map");
+		logger.debug(r.getName() + " ejected from map\n after " + 
+				Barrier.noStepsInter+ "steps");
 		
 		activeAgents--;
+		Barrier.noStepsInter = 0;
 		
 		if (activeAgents == 0) {
-			logger.info("All agents ejected from map.");
+			logger.info("All agents ejected from map\n after " 
+					+ Barrier.noStepsTotal + "steps");
 		}
 	}
 	
