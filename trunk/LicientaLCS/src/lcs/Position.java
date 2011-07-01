@@ -1,6 +1,7 @@
 package lcs;
 
 import java.util.LinkedList;
+import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -152,8 +153,13 @@ public class Position {
 	 * Set the position that returns to a valid route.
 	 * @param nextP - position to be set.
 	 */
-	public final void setWayBack(Position nextP){
-		wayBack = nextP;
+	public final void setWayBack(Vector<Position> adjacents){
+		Position chosen = null;
+		for(Position x:adjacents)
+			if (chosen == null ||
+				x.getTopologicPostion() < chosen.getTopologicPostion())
+				chosen = x;
+		wayBack = chosen;
 	}
 	
 	/**
