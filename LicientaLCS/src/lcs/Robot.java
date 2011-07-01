@@ -188,15 +188,22 @@ public class Robot extends Thread {
 				sbuff.append(x + " ");
 			adjacentStr = sbuff.toString();
 			logger.debug("Valid adjacents: " + adjacentStr);*/
+			nextMove = null;
+			/*
+			if (current.isDeadEnd()){
+				nextMove = current.getWayBack();
+				logger.debug("I'm on a dead end, going " + nextMove);
+			}*/
 
-			if (adjacent.size() == 1) { // we're stuck
+			if (adjacent.size() == 1 && nextMove == null) { // we're stuck
 				logger.debug(getName() + " is on his way backwards");
 				goBackNMark();
 			} else {
-				nextMove = null;
-				
+							
 				//	I'll wait to move till I get a free position in which I can move
-				nextMove = getNextMove(adjacent);
+				
+				if (nextMove == null)
+					nextMove = getNextMove(adjacent);
 
 				
 				if (nextMove == null) {
@@ -218,7 +225,7 @@ public class Robot extends Thread {
 					
 					//logger.debug("My current position has a current reward of " + 
 					//		nextMove.pheromone);
-					
+					logger.debug("chose "+nextMove);
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
 						lastSteps.removeFirst();
@@ -388,6 +395,7 @@ public class Robot extends Thread {
 				nextMove.blockRoute(current);
 				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
 				current.blockRoute(nextMove);
+				current.setWayBack(nextMove);
 				aux.nR--;
 			}
 			
