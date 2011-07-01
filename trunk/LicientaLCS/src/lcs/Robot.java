@@ -189,11 +189,11 @@ public class Robot extends Thread {
 			adjacentStr = sbuff.toString();
 			logger.debug("Valid adjacents: " + adjacentStr);*/
 			nextMove = null;
-			/*
+			
 			if (current.isDeadEnd()){
 				nextMove = current.getWayBack();
 				logger.debug("I'm on a dead end, going " + nextMove);
-			}*/
+			}
 
 			if (adjacent.size() == 1 && nextMove == null) { // we're stuck
 				logger.debug(getName() + " is on his way backwards");
@@ -383,6 +383,7 @@ public class Robot extends Thread {
 		Position nextMove;
 		// the no. of available routes at me current position
 		int noARoutes;
+		boolean exit = false;
 		
 		while (!lastSteps.isEmpty()) {
 			logger.debug(getName() + " is moving backward");
@@ -410,7 +411,9 @@ public class Robot extends Thread {
 				toBlock = false;
 			}
 			
+			
 			/* Actual movement backwards */
+			
 			while (!nextMove.sem.tryAcquire()) {
 				try {
 					logger.debug(getName() + " held his ground " + current +
@@ -420,7 +423,12 @@ public class Robot extends Thread {
 				} catch (InterruptedException ex) {
 					logger.error(getName() + "could not enter barrier");
 				}
+				if (nextMove.isDeadEnd()){
+					nextMove = nextMove.getWayBack();
+					exit = true;
+				}
 			}
+			
 
 			env.makeAction(robotId, nextMove);
 			current = nextMove;
@@ -429,6 +437,8 @@ public class Robot extends Thread {
 			} catch (InterruptedException ex) {
 				logger.error(getName() + "could not enter barrier");
 			}
+			if (exit = true)
+				break;
 		}
 	}
 	
