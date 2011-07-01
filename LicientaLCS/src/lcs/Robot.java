@@ -178,7 +178,8 @@ public class Robot extends Thread {
 		StringBuffer sbuff = new StringBuffer();*/
 		
 		while (current != target) {
-			logger.debug("My turn - i am on " + current);
+			logger.debug("My turn - i am on " + current + "" +
+					"\nheading for " + target );
 			
 			adjacent = env.getAdjacent(current);
 			removeDeadEnds(adjacent);
@@ -396,7 +397,7 @@ public class Robot extends Thread {
 				nextMove.blockRoute(current);
 				current.setDeadEnd();// its fully blocked  - aka a deadEnd 
 				current.blockRoute(nextMove);
-				current.setWayBack(nextMove);
+				current.setWayBack(env.getAdjacent(current));
 				aux.nR--;
 			}
 			
