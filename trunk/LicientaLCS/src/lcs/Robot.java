@@ -338,10 +338,10 @@ public class Robot extends Thread {
 			
 		while (!posQueue.isEmpty()) {
 			nextMove = posQueue.poll().pos;
-			logger.debug("permits available on " + nextMove +
-					" : " + nextMove.sem.availablePermits());
+			//logger.debug("permits available on " + nextMove +
+			//		" : " + nextMove.sem.availablePermits());
 			if (nextMove.sem.tryAcquire()) {
-				logger.debug("acquired "+nextMove);
+				//logger.debug("acquired "+nextMove);
 				return nextMove;
 			}
 		}
