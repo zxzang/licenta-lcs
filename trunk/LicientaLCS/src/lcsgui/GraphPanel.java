@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 
 import lcs.Edge;
 import lcs.Environment;
+import lcs.EnvironmentFeedback;
 import edu.uci.ics.jung.algorithms.layout.FRLayout2;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
@@ -19,7 +20,8 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 /**
  * A GUI for the {@link Environment} type.
  */
-public class GraphPanel extends JPanel implements KeyListener {
+public class GraphPanel extends JPanel implements KeyListener,
+		EnvironmentFeedback {
 	/**
 	 * Serial Version UID.
 	 * Eclipse wouldn't shut up about it.
@@ -67,8 +69,11 @@ public class GraphPanel extends JPanel implements KeyListener {
 		layout.setSize(new Dimension(WIDTH, HEIGHT));
 		
 		vv = new VisualizationViewer<lcs.Position, Edge>(layout);
+		
 		vv.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+		
 		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<lcs.Position>());
+		vv.getRenderContext().setVertexFillPaintTransformer(new PositionTrans());
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		
 		gm = new DefaultModalGraphMouse();
@@ -81,6 +86,8 @@ public class GraphPanel extends JPanel implements KeyListener {
 		
 		this.setBounds(0, 0, WIDTH, HEIGHT);
 		this.setVisible(true);
+		
+		env.addToFeedback(this);
 	}
 	
 	private void changeMouseType() {
@@ -108,8 +115,19 @@ public class GraphPanel extends JPanel implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {}
-	
-	// TODO add mouse listeners
-	// feature to click a node and get info on it
 
+	@Override
+	public void update() {
+		vv.repaint();
+	}
+
+	@Override
+	public void update(lcs.Position src, lcs.Position dst) {
+		vv.repaint();
+	}
+
+	@Override
+	public void change() {
+		vv.repaint();
+	}
 }

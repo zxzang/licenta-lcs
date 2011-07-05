@@ -70,7 +70,7 @@ public class Position {
 	 * Indicates which robot is currently occupying this position.
 	 * -1 for no agent.
 	 */
-	int robot;
+	protected int robot;
 
 	/**
 	 * The place this position holds within the topological sorting of the
@@ -267,6 +267,15 @@ public class Position {
 	 */
 	public final String toString() {
 		return this.namePos;
+	}
+
+	/**
+	 * Gets the current robot number on this position.
+	 * -1 for no robot.
+	 * @return the current robot.
+	 */
+	public int getRobot() {
+		return robot;
 	}
 
 }

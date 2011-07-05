@@ -333,6 +333,9 @@ public class Environment {
 			intialPos.sem.release();
 		robotPos.set(robotId, dst);
 		
+		intialPos.robot = -1;
+		dst.robot = robotId;
+		
 		giveFeedback(intialPos, dst);
 		
 		logger.debug(r.getName() + " got to " + dst + 
@@ -347,6 +350,8 @@ public class Environment {
 	 */
 	protected final void removeFromMap(int robotId) {
 		targetPosition.sem.release();
+		targetPosition.robot = -1;
+		
 		Robot r = agents.get(robotId);
 		logger.debug(r.getName() + " ejected from map after " + 
 				Barrier.noStepsInter+ " steps");
