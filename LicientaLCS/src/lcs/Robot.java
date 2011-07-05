@@ -424,13 +424,12 @@ public class Robot extends Thread {
 				} catch (InterruptedException ex) {
 					logger.error(getName() + "could not enter barrier");
 				}
-				if (nextMove.isDeadEnd()){
+				if (nextMove.isDeadEnd()) {
 					nextMove = nextMove.getWayBack();
 					exit = true;
 				}
 			}
 			
-
 			env.makeAction(robotId, nextMove);
 			current = nextMove;
 			try {

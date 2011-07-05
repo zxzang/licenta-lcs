@@ -23,8 +23,7 @@
 			<data key="robot1">bender</data>
 			<data key="robot2">r2d2</data>
 		</node>
-		<node id="c1">
-		</node>
+		<node id="c1"/>
 		<node id="c2"/>
 		<node id="c3"/>
 		<node id="c4"/>
@@ -37,7 +36,6 @@
 		<node id="c11">
 			<data key="nodeType">final</data>
 		</node>
-		
 		
 		<!-- edges -->
 		
@@ -59,4 +57,3 @@
 		
 	</graph>
 </graphml>
-

@@ -52,7 +52,7 @@ public class JUNGFrame extends JFrame implements EnvironmentFeedback {
 		getContentPane().setLayout(new
 				BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		add(graphPanel);
-		add(rewardPan);
+		//add(rewardPan);
 		
 		addWindowListener(new GraphWindowCloser());
 		setSize(WIDTH, HEIGHT);
