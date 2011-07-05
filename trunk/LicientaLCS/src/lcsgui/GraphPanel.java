@@ -1,6 +1,8 @@
 package lcsgui;
 
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JPanel;
 
@@ -17,7 +19,7 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 /**
  * A GUI for the {@link Environment} type.
  */
-public class GraphPanel extends JPanel {
+public class GraphPanel extends JPanel implements KeyListener {
 	/**
 	 * Serial Version UID.
 	 * Eclipse wouldn't shut up about it.
@@ -39,10 +41,24 @@ public class GraphPanel extends JPanel {
 	 */
 	static final int HEIGHT = 600;
 	
+	private Mode mouseType = Mode.PICKING;
+	
+	/**
+	 * The mouse handler.
+	 */
+	@SuppressWarnings("rawtypes")
+	DefaultModalGraphMouse gm;
+	
+	/**
+	 * The {@link VisualizationViewer} the panel uses.
+	 */
+	private VisualizationViewer<lcs.Position, Edge> vv;
+	
 	/**
 	 * Constructor for the class.
 	 * @param e - the {@link Environment} to be displayed.
 	 */
+	@SuppressWarnings("rawtypes")
 	public GraphPanel(final Environment e) {
 		this.env = e;
 		
@@ -50,22 +66,48 @@ public class GraphPanel extends JPanel {
 			new FRLayout2<lcs.Position, Edge>(this.env.getGraph());
 		layout.setSize(new Dimension(WIDTH, HEIGHT));
 		
-		VisualizationViewer<lcs.Position, Edge> vv = new
-			VisualizationViewer<lcs.Position, Edge>(layout);
+		vv = new VisualizationViewer<lcs.Position, Edge>(layout);
 		vv.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<lcs.Position>());
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		
-		@SuppressWarnings("rawtypes")
-		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
-		gm.setMode(Mode.PICKING);
+		gm = new DefaultModalGraphMouse();
+		gm.setMode(mouseType);
 		vv.setGraphMouse(gm);
 		
+		vv.addKeyListener(this);
 		this.add(vv);
+		this.addKeyListener(this);
 		
 		this.setBounds(0, 0, WIDTH, HEIGHT);
 		this.setVisible(true);
 	}
+	
+	private void changeMouseType() {
+		if (mouseType == Mode.PICKING) {
+			mouseType = Mode.TRANSFORMING;
+		} else {
+			mouseType = Mode.PICKING;
+		}
+		gm.setMode(mouseType);
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		char rel = e.getKeyChar();
+		switch (rel) {
+		case 'm':
+		case 'M':
+			changeMouseType();
+			break;
+		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {}
 	
 	// TODO add mouse listeners
 	// feature to click a node and get info on it
