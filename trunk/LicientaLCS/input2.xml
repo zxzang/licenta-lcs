@@ -18,8 +18,7 @@
 		<data key="robotType">Foresee</data>
 	
 		<!-- nodes -->
-		<node id="c0">
-		</node>
+		<node id="c0"/>
 		<node id="c1">
 			<data key="robot3">data</data>
 			<data key="robot1">bender</data>

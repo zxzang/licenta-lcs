@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Scanner;
 import java.util.Vector;
 
 import lcsmain.LcsMain;
@@ -338,9 +337,6 @@ public class Environment {
 		
 		logger.debug(r.getName() + " got to " + dst + 
 				"[" + dst.getTopologicPostion() + "]");
-		
-		
-		
 		return 0;
 	}
 	
@@ -352,15 +348,15 @@ public class Environment {
 	protected final void removeFromMap(int robotId) {
 		targetPosition.sem.release();
 		Robot r = agents.get(robotId);
-		logger.debug(r.getName() + " ejected from map\n after " + 
-				Barrier.noStepsInter+ "steps");
+		logger.debug(r.getName() + " ejected from map after " + 
+				Barrier.noStepsInter+ " steps");
 		
 		activeAgents--;
 		Barrier.noStepsInter = 0;
 		
 		if (activeAgents == 0) {
-			logger.info("All agents ejected from map\n after " 
-					+ Barrier.noStepsTotal + "steps");
+			logger.info("All agents ejected from map after " 
+					+ Barrier.noStepsTotal + " steps");
 		}
 	}
 	

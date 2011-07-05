@@ -31,7 +31,7 @@ public class RobotL2 extends Robot {
 				&& available.size() > 1)
 			available.remove(source);
 			*/
-		if (available.size() > 0){
+		if (available.size() > 0) {
 			selectedRule = LCSRule.selectRule(ruleSet, current, available);
 			
 			if (selectedRule == null) {

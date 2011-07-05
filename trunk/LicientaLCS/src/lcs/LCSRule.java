@@ -82,7 +82,7 @@ public class LCSRule {
 			Position src, Vector<Position> available) {
 		Vector<LCSRule> res = new Vector<LCSRule>();
 		
-		for(LCSRule x : ruleSet) {
+		for (LCSRule x : ruleSet) {
 			if (x.getCurrent() == src &&
 					available.contains(x.getNext()))
 				res.add(x);
@@ -117,7 +117,7 @@ public class LCSRule {
 		if (validRules.size() == 0)
 			return null;
 		
-		for(LCSRule x : validRules) {
+		for (LCSRule x : validRules) {
 			if (x.getFitness() < minFitness)
 				minFitness = x.getFitness();
 		}
@@ -133,7 +133,7 @@ public class LCSRule {
 		
 		chosenFitness = Math.abs(rand.nextLong() % totalFitness);
 		
-		for(LCSRule x : validRules) {
+		for (LCSRule x : validRules) {
 			currentFitness += x.getFitness();
 			if (currentFitness > chosenFitness) {
 				res = x;
@@ -141,9 +141,9 @@ public class LCSRule {
 			}
 		}
 		
-		/*	Reset fitness of rules to their original */
+		/* Reset fitness of rules to their original */
 		if (minFitness < 0) {
-			for(LCSRule x : validRules)
+			for (LCSRule x : validRules)
 				x.setFitness(x.getFitness() - Math.abs(minFitness) - 1);
 		}
 		
