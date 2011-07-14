@@ -1,13 +1,10 @@
 package lcsgui;
 
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 
 import lcs.Environment;
-import lcs.EnvironmentFeedback;
-import lcs.Position;
 
-public class JUNGFrame extends JFrame implements EnvironmentFeedback {
+public class JUNGFrame extends JFrame {
 
 	/**
 	 * Oh Eclipse you never stop.
@@ -17,7 +14,6 @@ public class JUNGFrame extends JFrame implements EnvironmentFeedback {
 	public Environment env;
 	
 	private GraphPanel graphPanel;
-	private RewardPanel rewardPan;
 	
 	/**
 	 * The width of the frame.
@@ -28,33 +24,11 @@ public class JUNGFrame extends JFrame implements EnvironmentFeedback {
 	 * The height of the frame.
 	 */
 	static final int HEIGHT = 800;
-
-	@Override
-	public void update() {
-		rewardPan.update();
-	}
-
-	@Override
-	public void update(Position src, Position dst) {
-		rewardPan.update();
-	}
-	 
-	@Override
-	public void change() {
-	}
 	
-	@Override
-	public void clear(Position pos) {
-	}
-
 	private void initFrame() {
 		graphPanel = new GraphPanel(env);
-		rewardPan = new RewardPanel(env);
 		
-		getContentPane().setLayout(new
-				BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		add(graphPanel);
-		//add(rewardPan);
 		
 		addWindowListener(new GraphWindowCloser());
 		setSize(WIDTH, HEIGHT);
@@ -64,7 +38,6 @@ public class JUNGFrame extends JFrame implements EnvironmentFeedback {
 		super("LCS");
 		this.env = env;
 		initFrame();
-		env.addToFeedback(this);
 	}
 	
 }
