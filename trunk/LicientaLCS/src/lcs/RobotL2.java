@@ -21,16 +21,7 @@ public class RobotL2 extends Robot {
 	@Override
 	protected Position getNextMove(Vector<Position> available) {
 		Position res = null;
-		//Position source = null;
-		//removePastSeenNodes(available);
 		
-		/*
-		if (lastSteps.size() >= 2)
-			source = lastSteps.get(1).pos;
-		if (source != null && available.contains(source) 
-				&& available.size() > 1)
-			available.remove(source);
-			*/
 		if (available.size() > 0) {
 			selectedRule = LCSRule.selectRule(ruleSet, current, available);
 			
@@ -44,11 +35,11 @@ public class RobotL2 extends Robot {
 				selectedRule = LCSRule.selectRule(ruleSet, current, available);
 			}
 			
-			if (selectedRule != null)
+			if (selectedRule != null) {
 				res = selectedRule.getNext();
-			
-			if (res.sem.tryAcquire())
-				return res;
+				if (res.sem.tryAcquire())
+					return res;
+			}
 			
 			return null;
 		} else

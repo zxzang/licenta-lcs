@@ -70,8 +70,6 @@ public class Environment {
 	
 	Vector<EnvironmentFeedback> feedback;
 	
-
-	
 	/**
 	 * Basic constructor.
 	 * @param input - the filename from which the graph is to be read.
@@ -351,6 +349,7 @@ public class Environment {
 	protected final void removeFromMap(int robotId) {
 		targetPosition.sem.release();
 		targetPosition.robot = -1;
+		sendClear(targetPosition);
 		
 		Robot r = agents.get(robotId);
 		logger.debug(r.getName() + " ejected from map after " + 
@@ -444,4 +443,9 @@ public class Environment {
 		}
 	}
 	
+	public void sendClear(Position pos) {
+		for (EnvironmentFeedback fb : this.feedback) {
+			fb.clear(pos);
+		}
+	}
 }

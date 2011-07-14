@@ -37,7 +37,6 @@ public class Robot extends Thread {
 		
 		@Override
 		public int compareTo(PositionNReward o) {
-			//return o.reward - this.reward;
 			if (this.reward < o.reward)
 				return 1;
 			if (this.reward == o.reward)
@@ -174,8 +173,6 @@ public class Robot extends Thread {
 				current.getTopologicPostion() + "]");
 		Position nextMove = null;
 		Vector<Position> adjacent;
-		/*String adjacentStr; // Consider deleting?
-		StringBuffer sbuff = new StringBuffer();*/
 		
 		while (current != target) {
 			logger.debug("My turn - i am on " + current + "" +
@@ -184,11 +181,6 @@ public class Robot extends Thread {
 			adjacent = env.getAdjacent(current);
 			removeDeadEnds(adjacent);
 			
-			/*sbuff.delete(0, sbuff.length());
-			for(Position x : adjacent)
-				sbuff.append(x + " ");
-			adjacentStr = sbuff.toString();
-			logger.debug("Valid adjacents: " + adjacentStr);*/
 			nextMove = null;
 			
 			if (current.isDeadEnd()){
@@ -202,7 +194,6 @@ public class Robot extends Thread {
 			} else {
 							
 				//	I'll wait to move till I get a free position in which I can move
-				
 				if (nextMove == null)
 					nextMove = getNextMove(adjacent);
 
@@ -210,8 +201,6 @@ public class Robot extends Thread {
 				if (nextMove == null) {
 					logger.debug(this.getName() + " held his ground");
 					
-					//logger.debug("My current position has a current reward of " + 
-					//		current.pheromone);
 					try {
 						bar.enterBarrier();
 					} catch (InterruptedException ex) {
@@ -224,8 +213,6 @@ public class Robot extends Thread {
 					 */
 					int reward = env.getReducedReward(nextMove);
 					
-					//logger.debug("My current position has a current reward of " + 
-					//		nextMove.pheromone);
 					logger.debug("chose "+nextMove);
 					lastSteps.addLast(new PositionNRoutes(current, adjacent.size()));
 					if (lastSteps.size() >= noStepsBack)
@@ -346,10 +333,7 @@ public class Robot extends Thread {
 			
 		while (!posQueue.isEmpty()) {
 			nextMove = posQueue.poll().pos;
-			//logger.debug("permits available on " + nextMove +
-			//		" : " + nextMove.sem.availablePermits());
 			if (nextMove.sem.tryAcquire()) {
-				//logger.debug("acquired "+nextMove);
 				return nextMove;
 			}
 		}
@@ -384,7 +368,6 @@ public class Robot extends Thread {
 		Position nextMove;
 		// the no. of available routes at me current position
 		int noARoutes;
-		boolean exit = false;
 		
 		while (!lastSteps.isEmpty()) {
 			logger.debug(getName() + " is moving backward");
@@ -414,7 +397,6 @@ public class Robot extends Thread {
 			
 			
 			/* Actual movement backwards */
-			
 			while (!nextMove.sem.tryAcquire()) {
 				try {
 					logger.debug(getName() + " held his ground " + current +
@@ -426,7 +408,6 @@ public class Robot extends Thread {
 				}
 				if (nextMove.isDeadEnd()) {
 					nextMove = nextMove.getWayBack();
-					exit = true;
 				}
 			}
 			
@@ -437,8 +418,6 @@ public class Robot extends Thread {
 			} catch (InterruptedException ex) {
 				logger.error(getName() + "could not enter barrier");
 			}
-			//if (exit == true)
-			//	break;
 		}
 	}
 	

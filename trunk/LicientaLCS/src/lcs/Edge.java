@@ -22,6 +22,11 @@ public class Edge {
 	String name;
 	
 	/**
+	 * Private variable that can be used by any other class.
+	 */
+	public Object userVar;
+	
+	/**
 	 * Basic constructor.
 	 * NOTE: not to be used yet.
 	 * @param f - the first Position.

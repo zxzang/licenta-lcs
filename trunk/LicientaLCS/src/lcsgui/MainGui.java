@@ -6,6 +6,8 @@ import lcs.Environment;
 
 public class MainGui {
 	
+	protected final static int timeMs = 1000;
+	
 	public MainGui(Environment env) {
 		JUNGFrame jframe = new JUNGFrame(env);
 		jframe.setVisible(true);

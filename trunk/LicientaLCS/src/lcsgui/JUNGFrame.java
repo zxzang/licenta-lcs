@@ -41,8 +41,10 @@ public class JUNGFrame extends JFrame implements EnvironmentFeedback {
 	 
 	@Override
 	public void change() {
-		// TODO Auto-generated method stub
-		
+	}
+	
+	@Override
+	public void clear(Position pos) {
 	}
 
 	private void initFrame() {
@@ -64,5 +66,5 @@ public class JUNGFrame extends JFrame implements EnvironmentFeedback {
 		initFrame();
 		env.addToFeedback(this);
 	}
-
+	
 }
