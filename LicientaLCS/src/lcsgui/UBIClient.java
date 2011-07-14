@@ -29,7 +29,7 @@ public class UBIClient implements EnvironmentFeedback {
 	
 	/**
 	 * Used to remember the direction of a edge.
-	 * Required for proper arrow orientaion.
+	 * Required for proper arrow orientation.
 	 */
 	class EdgeDirection {
 		public int edgeIndex;
@@ -81,6 +81,11 @@ public class UBIClient implements EnvironmentFeedback {
 	private int reverseStyles[];
 	
 	/**
+	 * Styles used for vertices.
+	 */
+	private int ocupiedPosStyle;
+	
+	/**
 	 * Finds the edge that connects 2 positions.
 	 * @param src - First {@link Position}.
 	 * @param dst - Second {@link Position}.
@@ -103,7 +108,7 @@ public class UBIClient implements EnvironmentFeedback {
 	@Override
 	public void change() {
 		/* How much one change function should take. */
-		final int timeMs = 1000;
+		int timeMs = MainGui.timeMs;
 		int steps = styles.length;
 		final int sleep = timeMs / steps;
 		
@@ -116,6 +121,7 @@ public class UBIClient implements EnvironmentFeedback {
 					edgeStyle = reverseStyles[i];
 					
 				ubiClient.changeEdgeStyle(pair.edgeDir.edgeIndex, edgeStyle);
+				ubiClient.changeVertexStyle(positionToGUI.get(pair.src), 0);
 			}
 			
 			try {
@@ -128,9 +134,16 @@ public class UBIClient implements EnvironmentFeedback {
 		/* Set them all back to the default style. */
 		for (PositionPair pair : toChange) {
 			ubiClient.changeEdgeStyle(pair.edgeDir.edgeIndex, 0);
+			ubiClient.changeVertexStyle(positionToGUI.get(pair.dst), ocupiedPosStyle);
 		}
 		
 		toChange.clear();
+	}
+	
+	@Override
+	public void clear(Position pos) {
+		System.err.println("sadas");
+		ubiClient.changeVertexStyle(positionToGUI.get(pos), ocupiedPosStyle);
 	}
 	
 	/**
@@ -196,6 +209,9 @@ public class UBIClient implements EnvironmentFeedback {
 			ubiClient.setEdgeStyleAttribute(reverseStyles[i], "arrow_reverse", "true");
 			ubiClient.setEdgeStyleAttribute(reverseStyles[i], "arrow_position", "" + (1 - x/steps));
 		}
+		
+		ocupiedPosStyle = ubiClient.newVertexStyle(0);
+		ubiClient.setVertexStyleAttribute(ocupiedPosStyle, "color", "#ff0000");
 	}
 	
 	public UBIClient(Environment env, String ip) {

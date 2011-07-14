@@ -26,4 +26,11 @@ public interface EnvironmentFeedback {
 	 */
 	public void change();
 	
+	/**
+	 * Required due to UBI implementation.
+	 * Clears a node.
+	 * @param pos
+	 */
+	public void clear(Position pos);
+	
 }

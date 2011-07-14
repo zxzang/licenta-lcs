@@ -3,19 +3,20 @@ package lcsgui;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.LinkedList;
 
 import javax.swing.JPanel;
 
 import lcs.Edge;
 import lcs.Environment;
 import lcs.EnvironmentFeedback;
+import lcs.Position;
 import edu.uci.ics.jung.algorithms.layout.FRLayout2;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
-import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 /**
  * A GUI for the {@link Environment} type.
@@ -27,6 +28,16 @@ public class GraphPanel extends JPanel implements KeyListener,
 	 * Eclipse wouldn't shut up about it.
 	 */
 	private static final long serialVersionUID = 4323232456487666646L;
+	
+	/*private class PositionPair {
+		public Position src;
+		public Position dst;
+		
+		public PositionPair(Position src, Position dst) {
+			this.src = src;
+			this.dst = dst;
+		}
+	}*/
 	
 	/**
 	 * The {@link Environment} to be displayed.
@@ -57,6 +68,13 @@ public class GraphPanel extends JPanel implements KeyListener,
 	private VisualizationViewer<lcs.Position, Edge> vv;
 	
 	/**
+	 * Transformer for the coloring of the positions.
+	 */
+	private PositionTrans posTrans;
+	
+	private LinkedList<Edge> toUpdate;
+	
+	/**
 	 * Constructor for the class.
 	 * @param e - the {@link Environment} to be displayed.
 	 */
@@ -65,16 +83,20 @@ public class GraphPanel extends JPanel implements KeyListener,
 		this.env = e;
 		
 		Layout<lcs.Position, Edge> layout =
-			new FRLayout2<lcs.Position, Edge>(this.env.getGraph());
+			new FRLayout2<Position, Edge>(this.env.getGraph());
 		layout.setSize(new Dimension(WIDTH, HEIGHT));
 		
-		vv = new VisualizationViewer<lcs.Position, Edge>(layout);
+		vv = new VisualizationViewer<Position, Edge>(layout);
 		
 		vv.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		
 		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<lcs.Position>());
-		vv.getRenderContext().setVertexFillPaintTransformer(new PositionTrans());
-		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		vv.getRenderContext().setVertexFillPaintTransformer(posTrans = new PositionTrans());
+		vv.getRenderer().getVertexLabelRenderer().setPosition(
+				edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position.CNTR);
+		
+		vv.getRenderContext().setEdgeStrokeTransformer(new EdgeStroker());
+		//vv.getRenderContext().setEdgeArrowTransformer(new EdgeArrowTrans());
 		
 		gm = new DefaultModalGraphMouse();
 		gm.setMode(mouseType);
@@ -86,6 +108,8 @@ public class GraphPanel extends JPanel implements KeyListener,
 		
 		this.setBounds(0, 0, WIDTH, HEIGHT);
 		this.setVisible(true);
+		
+		toUpdate = new LinkedList<Edge>();
 		
 		env.addToFeedback(this);
 	}
@@ -112,22 +136,47 @@ public class GraphPanel extends JPanel implements KeyListener,
 			break;
 		}
 	}
-
+	
 	@Override
 	public void keyTyped(KeyEvent e) {}
-
+	
 	@Override
 	public void update() {
 		vv.repaint();
 	}
-
+	
 	@Override
-	public void update(lcs.Position src, lcs.Position dst) {
-		vv.repaint();
+	public void update(Position src, Position dst) {
+		toUpdate.add(env.getGraph().findEdge(src, dst));
 	}
-
+	
 	@Override
 	public void change() {
+		int timeMs = MainGui.timeMs;
+		Object o = new Object();
+		for (Edge e : toUpdate) {
+			e.userVar = o;
+		}
+		posTrans.active = false;
+		vv.repaint();
+		
+		try {
+			Thread.sleep(timeMs);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		for (Edge e : toUpdate) {
+			e.userVar = null;
+		}
+		
+		toUpdate.clear();
+		posTrans.active = true;
 		vv.repaint();
 	}
+
+	@Override
+	public void clear(Position pos) {
+	}
+	
 }
