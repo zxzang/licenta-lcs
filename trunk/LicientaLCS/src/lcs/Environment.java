@@ -76,7 +76,7 @@ public class Environment {
 	 */
 	public Environment(final String input) {
 		this.agents = new Vector<Robot>();
-		this.feedback = new Vector<EnvironmentFeedback>(1);
+		this.feedback = new Vector<EnvironmentFeedback>(2);
 		Environment.robotBar = new Barrier(this);
 		
 		try {

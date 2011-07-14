@@ -6,9 +6,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import lcs.Environment;
+import lcs.EnvironmentFeedback;
 import lcs.Position;
 
-public class RewardPanel extends JPanel {
+public class RewardPanel extends JPanel implements EnvironmentFeedback {
 
 	/**
 	 * Eclipse wants it.
@@ -51,6 +52,7 @@ public class RewardPanel extends JPanel {
 		}
 		
 		this.setSize(300, info.size()*30);
+		env.addToFeedback(this);
 	}
 	
 	public void update() {
@@ -61,6 +63,19 @@ public class RewardPanel extends JPanel {
 	
 	public void update(Position pos) {
 		info.get(pos).update();
+	}
+
+	@Override
+	public void update(Position src, Position dst) {
+		update();
+	}
+
+	@Override
+	public void change() {
+	}
+
+	@Override
+	public void clear(Position pos) {
 	}
 	
 }

@@ -96,7 +96,6 @@ public class GraphPanel extends JPanel implements KeyListener,
 				edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position.CNTR);
 		
 		vv.getRenderContext().setEdgeStrokeTransformer(new EdgeStroker());
-		//vv.getRenderContext().setEdgeArrowTransformer(new EdgeArrowTrans());
 		
 		gm = new DefaultModalGraphMouse();
 		gm.setMode(mouseType);
