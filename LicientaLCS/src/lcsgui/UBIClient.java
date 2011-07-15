@@ -121,7 +121,7 @@ public class UBIClient implements EnvironmentFeedback {
 					edgeStyle = reverseStyles[i];
 					
 				ubiClient.changeEdgeStyle(pair.edgeDir.edgeIndex, edgeStyle);
-				ubiClient.changeVertexStyle(positionToGUI.get(pair.src), 0);
+				//ubiClient.changeVertexStyle(positionToGUI.get(pair.src), 0);
 			}
 			
 			try {
@@ -134,7 +134,7 @@ public class UBIClient implements EnvironmentFeedback {
 		/* Set them all back to the default style. */
 		for (PositionPair pair : toChange) {
 			ubiClient.changeEdgeStyle(pair.edgeDir.edgeIndex, 0);
-			ubiClient.changeVertexStyle(positionToGUI.get(pair.dst), ocupiedPosStyle);
+		//	ubiClient.changeVertexStyle(positionToGUI.get(pair.dst), ocupiedPosStyle);
 		}
 		
 		toChange.clear();
@@ -142,8 +142,7 @@ public class UBIClient implements EnvironmentFeedback {
 	
 	@Override
 	public void clear(Position pos) {
-		System.err.println("sadas");
-		ubiClient.changeVertexStyle(positionToGUI.get(pos), ocupiedPosStyle);
+		//ubiClient.changeVertexStyle(positionToGUI.get(pos), ocupiedPosStyle);
 	}
 	
 	/**
