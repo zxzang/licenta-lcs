@@ -47,12 +47,12 @@ public class GraphPanel extends JPanel implements KeyListener,
 	/**
 	 * The width of the panel.
 	 */
-	static final int WIDTH = 800;
+	static final int WIDTH = JUNGFrame.WIDTH;
 	
 	/**
 	 * The height of the panel.
 	 */
-	static final int HEIGHT = 600;
+	static final int HEIGHT = JUNGFrame.HEIGHT;
 	
 	private Mode mouseType = Mode.PICKING;
 	
